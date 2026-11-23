@@ -7,7 +7,14 @@ import {
   ShoppingCart,
   Trash2,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { ModalDialog } from "../components/ModalDialog";
 import { useApp } from "../context/AppContext";
 import {
@@ -54,6 +61,7 @@ export function TradeScreen({ kind }: { kind: "sale" | "purchase" }) {
   });
 
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>("সব");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [discountInput, setDiscountInput] = useState<string>("0");
@@ -113,7 +121,7 @@ export function TradeScreen({ kind }: { kind: "sale" | "purchase" }) {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = deferredSearchQuery.trim().toLowerCase();
     return products.filter((p) => {
       if (selectedCategory !== "সব" && p.category !== selectedCategory) {
         return false;
@@ -126,7 +134,7 @@ export function TradeScreen({ kind }: { kind: "sale" | "purchase" }) {
         p.category.toLowerCase().includes(q)
       );
     });
-  }, [products, selectedCategory, searchQuery]);
+  }, [products, selectedCategory, deferredSearchQuery]);
 
   const selectedCustomer = useMemo(
     () =>
@@ -776,6 +784,7 @@ export function TradeScreen({ kind }: { kind: "sale" | "purchase" }) {
 
         {/* Right Sticky Cart Column */}
         <aside
+          id="dm-pos-cart-panel"
           className="dm-pos-cart dm-card"
           aria-label="শপিং কার্ট ও বিলিং"
         >
@@ -1089,7 +1098,7 @@ export function TradeScreen({ kind }: { kind: "sale" | "purchase" }) {
               }}
             >
               <span>তারিখ</span>
-              <span className="dm-badge dm-badge-slate">{todayLabel}</span>
+              <strong style={{ color: "var(--dm-ink)" }}>{todayLabel}</strong>
             </div>
 
             <button
@@ -1108,6 +1117,31 @@ export function TradeScreen({ kind }: { kind: "sale" | "purchase" }) {
           </div>
         </aside>
       </div>
+
+      {/* Mobile Sticky Cart Summary Bar (< 1024px) */}
+      {cart.length > 0 && (
+        <div className="dm-pos-mobile-bar" role="region" aria-label="কার্ট সারাংশ">
+          <div className="dm-pos-mobile-bar-info">
+            <span className="dm-pos-mobile-bar-count">
+              {toBn(totalQty)}টি পণ্য
+            </span>
+            <strong className="dm-pos-mobile-bar-total dm-num">
+              {formatMoneyBn(grandTotal)}
+            </strong>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("dm-pos-cart-panel");
+              el?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="dm-btn dm-btn-primary dm-btn-sm"
+          >
+            <ShoppingCart size={15} aria-hidden="true" />
+            <span>কার্ট ও বিলিং</span>
+          </button>
+        </div>
+      )}
 
       {/* Rules Modal */}
       <ModalDialog

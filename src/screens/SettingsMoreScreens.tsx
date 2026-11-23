@@ -19,6 +19,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { PWAInstallButton } from "../components/PWAInstallButton";
 import { useApp } from "../context/AppContext";
 import { api, getStoredToken } from "../lib/api";
 import { normalizePhone, toBn } from "../lib/format";
@@ -502,15 +503,12 @@ export function SettingsScreen() {
                 <Database size={19} />
               </span>
               <div>
-                <h2 className="dm-card-title">JSON ডাটা স্টোরেজ ও ব্যাকআপ</h2>
+                <h2 className="dm-card-title">ব্যবসার সম্পূর্ণ ডাটা ব্যাকআপ</h2>
                 <p className="dm-page-sub">
-                  সার্ভার ফাইল: <code>data/db.json</code>
+                  পণ্য, কাস্টমার, চালান ও হিসাবের সম্পূর্ণ কপি JSON ফাইলে সংরক্ষণ করুন
                 </p>
               </div>
             </div>
-            <span className="dm-badge dm-badge-emerald">
-              data/db.json — সচল
-            </span>
           </div>
 
           <div className="dm-feed-list">
@@ -715,6 +713,9 @@ export function MoreScreen() {
           );
         })}
       </div>
+
+      {/* PWA App Install Card (shown when installable or on iOS Safari) */}
+      <PWAInstallButton variant="card" />
 
       {/* Clean Logout Button */}
       <button

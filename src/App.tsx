@@ -1,23 +1,78 @@
 import { ShieldAlert } from "lucide-react";
-import type { ReactNode } from "react";
+import { Suspense, lazy, type ReactNode } from "react";
 import { AppShell } from "./components/AppShell";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useApp } from "./context/AppContext";
 import { normalizePath, useRouter } from "./lib/router";
-import { CashBookScreen } from "./screens/CashBookScreen";
-import { CollectionsScreen } from "./screens/CollectionsScreen";
-import { CustomersScreen } from "./screens/CustomersScreen";
 import { DashboardScreen } from "./screens/DashboardScreen";
 import { LoginScreen } from "./screens/LoginScreen";
-import {
-  PurchasesScreen,
-  SuppliersScreen,
-} from "./screens/PurchasesSuppliersScreen";
-import { ReportsScreen } from "./screens/ReportsScreen";
-import { SalesScreen } from "./screens/SalesScreen";
-import { MoreScreen, SettingsScreen } from "./screens/SettingsMoreScreens";
-import { StaffScreen } from "./screens/StaffScreen";
-import { StockScreen } from "./screens/StockScreen";
-import { TradeScreen } from "./screens/TradeScreen";
+
+// Code-split secondary modules for faster initial smartphone load
+const CashBookScreen = lazy(() =>
+  import("./screens/CashBookScreen").then((m) => ({
+    default: m.CashBookScreen,
+  })),
+);
+const CollectionsScreen = lazy(() =>
+  import("./screens/CollectionsScreen").then((m) => ({
+    default: m.CollectionsScreen,
+  })),
+);
+const CustomersScreen = lazy(() =>
+  import("./screens/CustomersScreen").then((m) => ({
+    default: m.CustomersScreen,
+  })),
+);
+const PurchasesScreen = lazy(() =>
+  import("./screens/PurchasesSuppliersScreen").then((m) => ({
+    default: m.PurchasesScreen,
+  })),
+);
+const SuppliersScreen = lazy(() =>
+  import("./screens/PurchasesSuppliersScreen").then((m) => ({
+    default: m.SuppliersScreen,
+  })),
+);
+const ReportsScreen = lazy(() =>
+  import("./screens/ReportsScreen").then((m) => ({ default: m.ReportsScreen })),
+);
+const SalesScreen = lazy(() =>
+  import("./screens/SalesScreen").then((m) => ({ default: m.SalesScreen })),
+);
+const MoreScreen = lazy(() =>
+  import("./screens/SettingsMoreScreens").then((m) => ({
+    default: m.MoreScreen,
+  })),
+);
+const SettingsScreen = lazy(() =>
+  import("./screens/SettingsMoreScreens").then((m) => ({
+    default: m.SettingsScreen,
+  })),
+);
+const StaffScreen = lazy(() =>
+  import("./screens/StaffScreen").then((m) => ({ default: m.StaffScreen })),
+);
+const StockScreen = lazy(() =>
+  import("./screens/StockScreen").then((m) => ({ default: m.StockScreen })),
+);
+const TradeScreen = lazy(() =>
+  import("./screens/TradeScreen").then((m) => ({ default: m.TradeScreen })),
+);
+
+function ScreenSkeleton() {
+  return (
+    <div className="dm-screen-loader" role="status" aria-live="polite">
+      <div className="dm-skeleton dm-skeleton-title" />
+      <div className="dm-skeleton-grid">
+        <div className="dm-skeleton dm-skeleton-card" />
+        <div className="dm-skeleton dm-skeleton-card" />
+        <div className="dm-skeleton dm-skeleton-card" />
+        <div className="dm-skeleton dm-skeleton-card" />
+      </div>
+      <div className="dm-skeleton dm-skeleton-table" />
+    </div>
+  );
+}
 
 export function App() {
   const { loading, user, data } = useApp();
@@ -27,19 +82,31 @@ export function App() {
     return (
       <div className="dm-login-page">
         <div
-          className="dm-card"
+          className="dm-boot-card"
           role="status"
           aria-live="polite"
-          style={{ textAlign: "center", minWidth: 260 }}
         >
-          লোড হচ্ছে…
+          <img
+            src="/logo.svg"
+            alt=""
+            width={44}
+            height={44}
+            className="dm-boot-logo"
+          />
+          <div className="dm-boot-spinner" aria-hidden="true" />
+          <p>আল-বারাকাহ স্টোর লোড হচ্ছে…</p>
         </div>
       </div>
     );
   }
 
   if (!user || !data) {
-    return <LoginScreen />;
+    return (
+      <>
+        <OfflineIndicator />
+        <LoginScreen />
+      </>
+    );
   }
 
   const route = normalizePath(path);
@@ -104,7 +171,11 @@ export function App() {
     screen = <DashboardScreen />;
   }
 
-  return <AppShell>{screen}</AppShell>;
+  return (
+    <AppShell>
+      <Suspense fallback={<ScreenSkeleton />}>{screen}</Suspense>
+    </AppShell>
+  );
 }
 
 export default App;

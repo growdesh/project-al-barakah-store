@@ -1,14 +1,23 @@
 import { spawn } from "node:child_process";
+import path from "node:path";
 
-const api = spawn("node", ["server/index.mjs"], {
+const API_PORT = process.env.API_PORT || "3301";
+const WEB_PORT = process.env.PORT || "3000";
+
+const api = spawn(process.execPath, ["server/index.mjs"], {
   stdio: "inherit",
-  env: { ...process.env, API_PORT: process.env.API_PORT || "3301" },
+  env: { ...process.env, API_PORT },
 });
 
-const web = spawn("npx", ["vite", "--port", "3300"], {
-  stdio: "inherit",
-  env: process.env,
-});
+const viteBin = path.resolve(process.cwd(), "node_modules/vite/bin/vite.js");
+const web = spawn(
+  process.execPath,
+  [viteBin, "--port", WEB_PORT, "--host", "0.0.0.0"],
+  {
+    stdio: "inherit",
+    env: { ...process.env, API_PORT },
+  },
+);
 
 const children = [api, web];
 let shuttingDown = false;

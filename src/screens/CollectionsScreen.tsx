@@ -8,7 +8,13 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
 import { ModalDialog } from "../components/ModalDialog";
 import { useApp } from "../context/AppContext";
 import {
@@ -24,6 +30,7 @@ export function CollectionsScreen() {
   const { user, data, toast, createCollection } = useApp();
 
   const [search, setSearch] = useState<string>("");
+  const deferredSearch = useDeferredValue(search);
   const [staffFilter, setStaffFilter] = useState<string>("all");
 
   // Collect Due modal
@@ -100,7 +107,7 @@ export function CollectionsScreen() {
   }, [customers, collections, dueCustomers.length]);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = deferredSearch.trim().toLowerCase();
     return collections.filter((col) => {
       if (isAdmin && staffFilter !== "all" && col.staffId !== staffFilter) {
         return false;
@@ -114,7 +121,7 @@ export function CollectionsScreen() {
         (col.note ?? "").toLowerCase().includes(q)
       );
     });
-  }, [collections, isAdmin, staffFilter, search]);
+  }, [collections, isAdmin, staffFilter, deferredSearch]);
 
   const openCollectModal = () => {
     const first = dueCustomers[0];
@@ -328,12 +335,45 @@ export function CollectionsScreen() {
         )}
       </div>
 
-      {/* Collections Table */}
+      {/* Mobile Card List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="নগদ বাকি আদায়ের তালিকা">
+        {filtered.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো বাকি আদায়ের রেকর্ড পাওয়া যায়নি
+          </div>
+        ) : (
+          filtered.map((col) => (
+            <article key={col.id} className="dm-mcard">
+              <div className="dm-mcard-top">
+                <div className="dm-mcard-head">
+                  <strong className="dm-text-emerald">{col.receiptNo}</strong>
+                  <span className="dm-meta-tag">
+                    {col.invoiceNumber || "বকেয়া সমন্বয়"}
+                  </span>
+                </div>
+                <strong className="dm-mcard-amount dm-text-emerald dm-num">
+                  + {formatMoneyBn(col.amount)}
+                </strong>
+              </div>
+              <div className="dm-mcard-sub">
+                <strong>{col.customerName}</strong>
+                <span>
+                  {col.customerMobile} · {formatDateBn(col.date, true)}
+                  {isAdmin ? ` · ${col.staffName}` : ""}
+                </span>
+                {col.note && <span className="dm-mcard-note">{col.note}</span>}
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Collections Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="নগদ বাকি আদায়ের তালিকা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

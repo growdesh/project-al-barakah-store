@@ -364,12 +364,49 @@ export function CashBookScreen() {
         ))}
       </div>
 
-      {/* Cash Ledger Table */}
+      {/* Mobile Cash Ledger List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="নগদ লেনদেনের খাতা">
+        {filteredLedger.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো নগদ লেনদেন পাওয়া যায়নি
+          </div>
+        ) : (
+          filteredLedger.map((entry) => {
+            const isIn = entry.direction === "in";
+            const meta = kindMeta(entry.kind);
+            return (
+              <article key={entry.id} className="dm-mcard">
+                <div className="dm-mcard-top">
+                  <div className="dm-mcard-head">
+                    <strong>{entry.party}</strong>
+                    <span className={meta.cls}>{meta.label}</span>
+                  </div>
+                  <strong
+                    className={`dm-mcard-amount dm-num ${isIn ? "dm-text-emerald" : "dm-text-rose"}`}
+                  >
+                    {isIn ? "+" : "−"} {formatMoneyBn(entry.amount)}
+                  </strong>
+                </div>
+                <div className="dm-mcard-sub">
+                  <span>
+                    {formatDateBn(entry.date, true)} · {entry.staffName}
+                  </span>
+                  {entry.note && (
+                    <span className="dm-mcard-note">{entry.note}</span>
+                  )}
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Cash Ledger Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="নগদ লেনদেনের খাতা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

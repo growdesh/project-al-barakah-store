@@ -381,12 +381,87 @@ export function StaffScreen() {
         ))}
       </div>
 
-      {/* Staff Performance Table */}
+      {/* Mobile Staff Card List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="স্টাফ তালিকা ও পারফরম্যান্স">
+        {filteredStaff.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো স্টাফ অ্যাকাউন্ট পাওয়া যায়নি
+          </div>
+        ) : (
+          filteredStaff.map((member) => (
+            <article key={member.id} className="dm-mcard">
+              <div className="dm-mcard-top">
+                <div className="dm-mcard-head">
+                  <strong>{member.name}</strong>
+                  <span className="dm-meta-tag">
+                    {member.role === "admin" ? "অ্যাডমিন" : "স্টাফ"}
+                  </span>
+                </div>
+                <span
+                  className={`dm-badge ${
+                    member.active ? "dm-badge-emerald" : "dm-badge-rose"
+                  }`}
+                >
+                  {member.active ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                </span>
+              </div>
+              <div className="dm-mcard-sub">
+                <span>
+                  {member.phone}
+                  {member.note ? ` · ${member.note}` : ""}
+                </span>
+              </div>
+              <div className="dm-mcard-metrics">
+                <span>
+                  বিক্রি:{" "}
+                  <strong className="dm-num">
+                    {formatMoneyBn(member.totalSales)}
+                  </strong>
+                </span>
+                <span>
+                  নগদ:{" "}
+                  <strong className="dm-text-emerald dm-num">
+                    {formatMoneyBn(member.totalCashReceived)}
+                  </strong>
+                </span>
+                <span>
+                  বাকি:{" "}
+                  <strong
+                    className={`${member.outstandingDue > 0 ? "dm-text-rose" : "dm-text-muted"} dm-num`}
+                  >
+                    {formatMoneyBn(member.outstandingDue)}
+                  </strong>
+                </span>
+              </div>
+              <div className="dm-mcard-actions">
+                <button
+                  type="button"
+                  onClick={() => openStaffReport(member)}
+                  className="dm-btn dm-btn-soft-emerald dm-btn-sm"
+                >
+                  <FileBarChart2 size={15} aria-hidden="true" />
+                  <span>রিপোর্ট</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openEditModal(member)}
+                  className="dm-btn dm-btn-outline dm-btn-sm"
+                >
+                  <Pencil size={14} aria-hidden="true" />
+                  <span>সম্পাদনা</span>
+                </button>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Staff Performance Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="স্টাফ তালিকা ও পারফরম্যান্স"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

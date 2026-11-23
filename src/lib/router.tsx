@@ -65,6 +65,10 @@ export function navigate(to: string, opts: { replace?: boolean } = {}) {
     requestAnimationFrame(() => tryScroll(20));
   } else {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    const mainCol = document.querySelector(".dm-main-col");
+    if (mainCol) {
+      mainCol.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
   }
 }
 

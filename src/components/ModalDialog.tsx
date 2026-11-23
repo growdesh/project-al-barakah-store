@@ -6,7 +6,7 @@ export interface ModalDialogProps {
   onClose: () => void;
   title: string;
   subtitle?: string;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
   children: ReactNode;
   footer?: ReactNode;
 }
@@ -90,15 +90,23 @@ export function ModalDialog({
     };
   }, []);
 
+  const sizeClass =
+    size === "lg"
+      ? "dm-dialog dm-dialog-lg"
+      : size === "sm"
+        ? "dm-dialog dm-dialog-sm"
+        : "dm-dialog";
+
   return (
     <dialog
       ref={dialogRef}
-      className={size === "lg" ? "dm-dialog dm-dialog-lg" : "dm-dialog"}
+      className={sizeClass}
       aria-labelledby={titleId}
       {...({ closedby: "any" } as Record<string, string>)}
     >
+      <div className="dm-sheet-handle" aria-hidden="true" />
       <div className="dm-dialog-head">
-        <div>
+        <div className="dm-dialog-title-wrap">
           <h2 id={titleId} className="dm-dialog-title">
             {title}
           </h2>

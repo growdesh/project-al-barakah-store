@@ -8,7 +8,13 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
 import { ModalDialog } from "../components/ModalDialog";
 import { useApp } from "../context/AppContext";
 import {
@@ -34,6 +40,7 @@ export function SalesScreen() {
   const { user, data, toast, createCollection } = useApp();
 
   const [search, setSearch] = useState<string>("");
+  const deferredSearch = useDeferredValue(search);
   const [staffFilter, setStaffFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | InvoiceStatus>("all");
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
@@ -72,7 +79,7 @@ export function SalesScreen() {
   }, [staffList, invoices]);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = deferredSearch.trim().toLowerCase();
     return invoices.filter((inv) => {
       if (isAdmin && staffFilter !== "all" && inv.staffId !== staffFilter) {
         return false;
@@ -88,7 +95,7 @@ export function SalesScreen() {
         inv.staffName.toLowerCase().includes(q)
       );
     });
-  }, [invoices, isAdmin, staffFilter, statusFilter, search]);
+  }, [invoices, isAdmin, staffFilter, statusFilter, deferredSearch]);
 
   const kpis = useMemo(() => {
     let total = 0;
@@ -309,12 +316,93 @@ export function SalesScreen() {
         ))}
       </div>
 
-      {/* Invoices Table */}
+      {/* Mobile Card List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="বিক্রয় চালানের তালিকা">
+        {filtered.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো বিক্রয় ইনভয়েস পাওয়া যায়নি
+          </div>
+        ) : (
+          filtered.map((inv) => {
+            const badge = invoiceBadge(inv.status);
+            const canCollect = inv.due > 0 && inv.customerId !== "walk-in";
+            return (
+              <article key={inv.id} className="dm-mcard">
+                <div className="dm-mcard-top">
+                  <div className="dm-mcard-head">
+                    <strong className="dm-text-emerald">{inv.number}</strong>
+                    <span className={badge.cls}>{badge.label}</span>
+                  </div>
+                  <strong className="dm-mcard-amount dm-num">
+                    {formatMoneyBn(inv.total)}
+                  </strong>
+                </div>
+                <div className="dm-mcard-sub">
+                  <strong>{inv.customerName}</strong>
+                  <span>
+                    {inv.customerMobile || "ওয়াক-ইন"} ·{" "}
+                    {formatDateBn(inv.date, true)}
+                    {isAdmin ? ` · ${inv.staffName}` : ""}
+                  </span>
+                </div>
+                <div className="dm-mcard-metrics">
+                  <span>
+                    জমা:{" "}
+                    <strong className="dm-text-emerald dm-num">
+                      {formatMoneyBn(inv.paid)}
+                    </strong>
+                  </span>
+                  <span>
+                    বাকি:{" "}
+                    <strong
+                      className={`${inv.due > 0 ? "dm-text-rose" : "dm-text-muted"} dm-num`}
+                    >
+                      {formatMoneyBn(inv.due)}
+                    </strong>
+                  </span>
+                </div>
+                <div className="dm-mcard-actions">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedInvoiceId(inv.id)}
+                    className="dm-btn dm-btn-outline dm-btn-sm"
+                  >
+                    <Eye size={15} aria-hidden="true" />
+                    <span>দেখুন</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedInvoiceId(inv.id);
+                      setPendingPrint(true);
+                    }}
+                    className="dm-btn dm-btn-outline dm-btn-sm"
+                  >
+                    <Printer size={15} aria-hidden="true" />
+                    <span>প্রিন্ট</span>
+                  </button>
+                  {canCollect && (
+                    <button
+                      type="button"
+                      onClick={() => openQuickCollect(inv)}
+                      className="dm-btn dm-btn-soft-emerald dm-btn-sm"
+                    >
+                      আদায়
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Invoices Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="বিক্রয় চালানের তালিকা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

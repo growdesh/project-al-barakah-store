@@ -207,12 +207,70 @@ export function PurchasesScreen() {
         ))}
       </div>
 
-      {/* Purchases Table */}
+      {/* Mobile Purchases Card List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="ক্রয় চালানের তালিকা">
+        {filtered.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো ক্রয় চালান পাওয়া যায়নি
+          </div>
+        ) : (
+          filtered.map((pur) => {
+            const badge = purchaseStatusBadge(pur.status);
+            return (
+              <article key={pur.id} className="dm-mcard">
+                <div className="dm-mcard-top">
+                  <div className="dm-mcard-head">
+                    <strong className="dm-text-blue">{pur.number}</strong>
+                    <span className={badge.cls}>{badge.label}</span>
+                  </div>
+                  <strong className="dm-mcard-amount dm-num">
+                    {formatMoneyBn(pur.total)}
+                  </strong>
+                </div>
+                <div className="dm-mcard-sub">
+                  <strong>{pur.supplierName}</strong>
+                  <span>
+                    {pur.supplierMobile} · {formatDateBn(pur.date)}
+                  </span>
+                </div>
+                <div className="dm-mcard-metrics">
+                  <span>
+                    পরিশোধ:{" "}
+                    <strong className="dm-text-emerald dm-num">
+                      {formatMoneyBn(pur.paid)}
+                    </strong>
+                  </span>
+                  <span>
+                    দেনা:{" "}
+                    <strong
+                      className={`${pur.due > 0 ? "dm-text-rose" : "dm-text-muted"} dm-num`}
+                    >
+                      {formatMoneyBn(pur.due)}
+                    </strong>
+                  </span>
+                </div>
+                <div className="dm-mcard-actions">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPurchase(pur)}
+                    className="dm-btn dm-btn-outline dm-btn-sm"
+                  >
+                    <Eye size={14} aria-hidden="true" />
+                    <span>বিস্তারিত</span>
+                  </button>
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Purchases Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="ক্রয় চালানের তালিকা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>
@@ -754,12 +812,62 @@ export function SuppliersScreen() {
         ))}
       </div>
 
-      {/* Suppliers Table */}
+      {/* Mobile Suppliers Card List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="সাপ্লায়ার তালিকা">
+        {filtered.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো সাপ্লায়ার পাওয়া যায়নি
+          </div>
+        ) : (
+          filtered.map((s) => (
+            <article key={s.id} className="dm-mcard">
+              <div className="dm-mcard-top">
+                <div className="dm-mcard-head">
+                  <strong className="dm-text-emerald">{s.name}</strong>
+                </div>
+                <strong
+                  className={`dm-mcard-amount dm-num ${s.due > 0 ? "dm-text-rose" : "dm-text-emerald"}`}
+                >
+                  {formatMoneyBn(s.due)}
+                </strong>
+              </div>
+              <div className="dm-mcard-sub">
+                <span>
+                  {s.mobile} · {s.area}
+                </span>
+                <span>শেষ লেনদেন: {s.lastTxn}</span>
+              </div>
+              <div className="dm-mcard-actions">
+                {s.due > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => openPayModal(s)}
+                    className="dm-btn dm-btn-soft-emerald dm-btn-sm"
+                  >
+                    <Wallet size={14} aria-hidden="true" />
+                    <span>নগদ পরিশোধ</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => openEditModal(s)}
+                  className="dm-btn dm-btn-outline dm-btn-sm"
+                >
+                  <Pencil size={14} aria-hidden="true" />
+                  <span>সম্পাদনা</span>
+                </button>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Suppliers Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="সাপ্লায়ার তালিকা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

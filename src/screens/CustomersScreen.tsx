@@ -371,12 +371,71 @@ export function CustomersScreen() {
         ))}
       </div>
 
-      {/* Customers Table */}
+      {/* Mobile Card List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="কাস্টমার তালিকা">
+        {filtered.length === 0 ? (
+          <div className="dm-card dm-empty-inline">
+            কোনো কাস্টমার পাওয়া যায়নি
+          </div>
+        ) : (
+          filtered.map((c) => (
+            <article key={c.id} className="dm-mcard">
+              <div className="dm-mcard-top">
+                <div className="dm-mcard-head">
+                  <strong className="dm-text-emerald">{c.name}</strong>
+                </div>
+                <strong
+                  className={`dm-mcard-amount dm-num ${c.due > 0 ? "dm-text-rose" : "dm-text-emerald"}`}
+                >
+                  {formatMoneyBn(c.due)}
+                </strong>
+              </div>
+              <div className="dm-mcard-sub">
+                <span>
+                  {c.mobile} · {c.area || "এলাকা উল্লেখ নেই"}
+                </span>
+              </div>
+              <div className="dm-mcard-actions">
+                <button
+                  type="button"
+                  onClick={() => openDetailModal(c)}
+                  className="dm-btn dm-btn-outline dm-btn-sm"
+                >
+                  <Eye size={15} aria-hidden="true" />
+                  <span>দেখুন</span>
+                </button>
+                {isAdmin && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label={`${c.name} সম্পাদনা`}
+                      onClick={() => openEditModal(c)}
+                      className="dm-icon-btn"
+                    >
+                      <Edit3 size={15} aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`${c.name} মুছুন`}
+                      onClick={() => setDeletingCustomer(c)}
+                      className="dm-icon-btn dm-icon-btn-danger"
+                    >
+                      <Trash2 size={15} aria-hidden="true" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Customers Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="কাস্টমার তালিকা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

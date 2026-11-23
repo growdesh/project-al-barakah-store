@@ -16,10 +16,11 @@ import {
 } from "./db.mjs";
 import { formatDateBn } from "./seed.mjs";
 
-const PORT = Number(process.env.API_PORT || process.env.PORT || 3300);
+const PORT = Number(process.env.API_PORT || process.env.PORT || 3000);
 const DIST_DIR = path.resolve(process.cwd(), "dist");
 const SESSION_COOKIE = "ab_session";
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
+const NOINDEX_HEADER = "noindex, nofollow, noarchive, nosnippet";
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -27,6 +28,7 @@ const MIME_TYPES = {
   ".mjs": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".jpg": "image/jpeg",
@@ -113,6 +115,7 @@ function sendJson(res, status, data, extraHeaders = {}) {
   res.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
+    "X-Robots-Tag": NOINDEX_HEADER,
     ...extraHeaders,
   });
   res.end(body);
@@ -217,6 +220,7 @@ async function serveStatic(req, res, pathname) {
         "Content-Type": contentType,
         "Content-Length": stat.size,
         "Cache-Control": isImmutable ? "public, max-age=31536000, immutable" : "no-cache",
+        "X-Robots-Tag": NOINDEX_HEADER,
       });
       res.end(data);
       return true;
@@ -234,7 +238,10 @@ async function serveStatic(req, res, pathname) {
     return;
   }
 
-  res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+  res.writeHead(404, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "X-Robots-Tag": NOINDEX_HEADER,
+  });
   res.end("Frontend build (dist/) পাওয়া যায়নি। ডেভেলপমেন্ট মোডে Vite সার্ভার ব্যবহার করুন।");
 }
 
@@ -1435,6 +1442,7 @@ async function handleApi(req, res, pathname) {
       "Content-Type": "application/json; charset=utf-8",
       "Content-Disposition": 'attachment; filename="al-barakah-store-backup.json"',
       "Cache-Control": "no-store",
+      "X-Robots-Tag": NOINDEX_HEADER,
     });
     return res.end(formatted);
   }

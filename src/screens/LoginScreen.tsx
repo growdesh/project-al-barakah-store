@@ -1,5 +1,6 @@
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
+import { PWAInstallButton } from "../components/PWAInstallButton";
 import { useApp } from "../context/AppContext";
 import { normalizePhone } from "../lib/format";
 
@@ -170,6 +171,10 @@ export function LoginScreen() {
           </button>
         </form>
       </main>
+
+      <div className="dm-login-install-wrap">
+        <PWAInstallButton variant="card" />
+      </div>
     </div>
   );
 }

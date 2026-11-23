@@ -440,12 +440,99 @@ export function StockScreen() {
         ))}
       </div>
 
-      {/* Stock Table */}
+      {/* Mobile Product Stock List (< 768px) */}
+      <div className="dm-mobile-list" aria-label="পণ্য ও স্টক তালিকা">
+        {filtered.length === 0 ? (
+          <div className="dm-card dm-empty-inline">কোনো পণ্য পাওয়া যায়নি</div>
+        ) : (
+          filtered.map((p) => {
+            const isOut = p.stock <= 0;
+            const isLow = p.stock > 0 && p.stock <= p.minStock;
+            const stockValue = Math.max(0, p.stock) * (p.purchaseRate ?? 0);
+            return (
+              <article key={p.id} className="dm-mcard">
+                <div className="dm-mcard-top">
+                  <div className="dm-mcard-head">
+                    <strong>{p.name}</strong>
+                  </div>
+                  <span
+                    className={`dm-badge ${
+                      isOut
+                        ? "dm-badge-rose"
+                        : isLow
+                          ? "dm-badge-amber"
+                          : "dm-badge-emerald"
+                    }`}
+                  >
+                    {isOut
+                      ? "স্টক নেই"
+                      : isLow
+                        ? `কম: ${toBn(p.stock)} ${p.unit}`
+                        : `${toBn(p.stock)} ${p.unit}`}
+                  </span>
+                </div>
+                <div className="dm-mcard-sub">
+                  <span>
+                    {p.category} · {p.sku}
+                  </span>
+                </div>
+                <div className="dm-mcard-metrics">
+                  <span>
+                    বিক্রয়:{" "}
+                    <strong className="dm-num">
+                      {formatMoneyBn(p.saleRate)}
+                    </strong>
+                  </span>
+                  <span>
+                    ক্রয়:{" "}
+                    <strong className="dm-text-muted dm-num">
+                      {formatMoneyBn(p.purchaseRate ?? 0)}
+                    </strong>
+                  </span>
+                  <span>
+                    মূল্য:{" "}
+                    <strong className="dm-num">
+                      {formatMoneyBn(stockValue)}
+                    </strong>
+                  </span>
+                </div>
+                <div className="dm-mcard-actions">
+                  <button
+                    type="button"
+                    onClick={() => openAdjustModal(p)}
+                    className="dm-btn dm-btn-soft-emerald dm-btn-sm"
+                  >
+                    স্টক সমন্বয়
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`${p.name} সম্পাদনা`}
+                    onClick={() => openEditModal(p)}
+                    className="dm-icon-btn"
+                  >
+                    <Edit3 size={15} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`${p.name} মুছুন`}
+                    onClick={() => setDeletingProduct(p)}
+                    className="dm-icon-btn dm-icon-btn-danger"
+                  >
+                    <Trash2 size={15} aria-hidden="true" />
+                  </button>
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Stock Table (>= 768px) */}
       <div
         tabIndex={0}
         role="region"
         aria-label="পণ্য ও স্টক তালিকা"
-        className="dm-table-wrap"
+        className="dm-table-wrap dm-desktop-table"
       >
         <table className="dm-table">
           <thead>

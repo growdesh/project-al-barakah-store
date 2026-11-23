@@ -18,11 +18,20 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useApp } from "../context/AppContext";
 import { formatDateBn, formatMoneyBn, formatNumberBn } from "../lib/format";
 import { Link, useRouter } from "../lib/router";
 import { ModalDialog } from "./ModalDialog";
+import { OfflineIndicator } from "./OfflineIndicator";
+import { PWAInstallButton } from "./PWAInstallButton";
 
 interface NavDef {
   label: string;
@@ -70,6 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const deferredSearchTerm = useDeferredValue(searchTerm);
   const [searchKind, setSearchKind] = useState<string>("সব");
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -182,7 +192,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const searchMatches = useMemo(() => {
     if (!data) return [];
-    const q = searchTerm.trim().toLowerCase();
+    const q = deferredSearchTerm.trim().toLowerCase();
     if (!q) return [];
 
     const customers = data.customers
@@ -192,7 +202,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           c.mobile.toLowerCase().includes(q) ||
           c.area.toLowerCase().includes(q),
       )
-      .slice(0, 4)
+      .slice(0, 5)
       .map((c) => ({
         key: `cust-${c.id}`,
         kind: "কাস্টমার",
@@ -209,7 +219,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           inv.customerName.toLowerCase().includes(q) ||
           inv.customerMobile.toLowerCase().includes(q),
       )
-      .slice(0, 4)
+      .slice(0, 5)
       .map((inv) => ({
         key: `inv-${inv.id}`,
         kind: "ইনভয়েস",
@@ -227,7 +237,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           p.barcode.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q),
       )
-      .slice(0, 4)
+      .slice(0, 5)
       .map((p) => ({
         key: `prd-${p.id}`,
         kind: "পণ্য",
@@ -240,7 +250,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     const all = [...customers, ...invoices, ...products];
     if (searchKind === "সব") return all.slice(0, 12);
     return all.filter((item) => item.kind === searchKind).slice(0, 12);
-  }, [data, searchTerm, searchKind, isAdmin]);
+  }, [data, deferredSearchTerm, searchKind, isAdmin]);
 
   if (!data || !user) {
     return null;
@@ -250,10 +260,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     typeof navigator !== "undefined" &&
     /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent);
 
-  const initials = getUserInitials(
-    user.name,
-    data.store.initials || "AB",
-  );
+  const initials = getUserInitials(user.name, data.store.initials || "AB");
 
   return (
     <div className="dm-root">
@@ -268,12 +275,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               <img
                 src="/logo.svg"
                 alt={data.store.name}
-                width={38}
-                height={38}
+                width={36}
+                height={36}
                 className="dm-sidebar-logo"
               />
               {!collapsed && (
-                <span className="dm-sidebar-title">{data.store.name}</span>
+                <div className="dm-sidebar-brand-text">
+                  <span className="dm-sidebar-title">{data.store.name}</span>
+                  <span className="dm-sidebar-subtitle">
+                    {isAdmin ? "অ্যাডমিন প্যানেল" : "স্টাফ ওয়ার্কস্পেস"}
+                  </span>
+                </div>
               )}
             </Link>
             <button
@@ -357,6 +369,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </nav>
 
+          {!collapsed && (
+            <div className="dm-sidebar-pwa">
+              <PWAInstallButton variant="sidebar" />
+            </div>
+          )}
+
           <div
             className="dm-sidebar-footer"
             data-sidebar-footer="true"
@@ -407,14 +425,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <img
                   src="/logo.svg"
                   alt={data.store.name}
-                  width={34}
-                  height={34}
+                  width={32}
+                  height={32}
                 />
               </Link>
               <div className="dm-org-meta">
                 <p className="dm-org-title">{data.store.name}</p>
                 <p className="dm-org-address">
-                  <MapPin size={13} aria-hidden="true" />
+                  <MapPin size={12} aria-hidden="true" />
                   <span>{data.store.address}</span>
                 </p>
               </div>
@@ -427,8 +445,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="dm-topbar-search"
             >
               <span className="dm-topbar-search-inner">
-                <Search size={16} aria-hidden="true" />
-                <span>খুঁজুন…</span>
+                <Search size={15} aria-hidden="true" />
+                <span>কাস্টমার, চালান বা পণ্য খুঁজুন…</span>
               </span>
               <kbd className="dm-kbd" aria-hidden="true">
                 {isMac ? "⌘K" : "Ctrl K"}
@@ -436,14 +454,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
 
             <div className="dm-topbar-right">
+              <PWAInstallButton variant="compact" />
+
               <span
-                className={`dm-role-pill${isAdmin ? "" : " is-staff"}`}
-                style={{ maxWidth: "clamp(100px, 34vw, 260px)" }}
+                className={`dm-role-tag${isAdmin ? "" : " is-staff"}`}
                 title={isAdmin ? "অ্যাডমিন" : `স্টাফ · ${user.name}`}
               >
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {isAdmin ? "অ্যাডমিন" : `স্টাফ · ${user.name}`}
-                </span>
+                <span>{isAdmin ? "অ্যাডমিন" : `স্টাফ · ${user.name}`}</span>
               </span>
 
               <button
@@ -452,7 +469,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() => setSearchOpen(true)}
                 className="dm-mobile-search-btn"
               >
-                <Search size={19} aria-hidden="true" />
+                <Search size={18} aria-hidden="true" />
               </button>
 
               <div className="dm-profile-wrap" ref={profileWrapRef}>
@@ -465,7 +482,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                   className="dm-avatar-btn"
                 >
                   <span>{initials}</span>
-                  <span className="dm-avatar-dot" aria-hidden="true" />
                 </button>
 
                 {profileOpen && (
@@ -476,7 +492,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <div className="dm-profile-head">
                       <strong>{user.name}</strong>
-                      <span>{user.phone}</span>
+                      <span>
+                        {isAdmin ? "অ্যাডমিন" : "স্টাফ"} · {user.phone}
+                      </span>
                     </div>
 
                     {isAdmin && (
@@ -512,6 +530,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </header>
 
+          <OfflineIndicator />
+
           <main className="dm-content">{children}</main>
         </div>
       </div>
@@ -544,8 +564,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <ModalDialog
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
-        title="খুঁজুন"
-        subtitle="কাস্টমার, ইনভয়েস বা পণ্য"
+        title="দ্রুত অনুসন্ধান"
+        subtitle="কাস্টমার, ইনভয়েস বা পণ্য খুঁজুন"
         size="lg"
       >
         <input
@@ -591,10 +611,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 }}
                 className="dm-search-result"
               >
-                <span className="dm-badge dm-badge-emerald">{item.kind}</span>
                 <span className="dm-search-result-meta">
                   <strong>{item.title}</strong>
-                  <small>{item.sub}</small>
+                  <small>
+                    {item.kind} · {item.sub}
+                  </small>
                 </span>
                 <span className="dm-search-result-amount">
                   {formatMoneyBn(item.amount)}

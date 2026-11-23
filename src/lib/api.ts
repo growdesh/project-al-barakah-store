@@ -41,6 +41,16 @@ export function clearStoredToken(): void {
   }
 }
 
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 export async function apiRequest<T>(
   path: string,
   opts: RequestInit = {},
@@ -82,7 +92,7 @@ export async function apiRequest<T>(
       typeof (data as { error?: unknown }).error === "string"
         ? (data as { error: string }).error
         : "অনুরোধ ব্যর্থ হয়েছে";
-    throw new Error(errMsg);
+    throw new ApiError(res.status, errMsg);
   }
 
   return data as T;

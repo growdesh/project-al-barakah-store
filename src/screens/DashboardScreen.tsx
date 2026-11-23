@@ -676,13 +676,12 @@ export function DashboardScreen() {
                             className="dm-text-muted"
                             style={{ fontWeight: 500 }}
                           >
-                            {formatDateBn(item.date, true)}
+                            {item.kind} · {formatDateBn(item.date, true)}
                           </small>
                         </span>
                       </span>
                       <span className="dm-table-actions" style={{ flexShrink: 0 }}>
-                        <span className={item.badgeCls}>{item.kind}</span>
-                        <strong style={{ whiteSpace: "nowrap" }}>
+                        <strong className="dm-num" style={{ whiteSpace: "nowrap" }}>
                           {formatMoneyBn(item.amount)}
                         </strong>
                       </span>
@@ -916,8 +915,8 @@ export function DashboardScreen() {
                         flex: 1,
                       }}
                     >
-                      <span className="dm-badge dm-badge-slate">
-                        #{toBn(index + 1)}
+                      <span className="dm-rank-num">
+                        {toBn(index + 1)}.
                       </span>
                       <span
                         style={{
@@ -929,9 +928,7 @@ export function DashboardScreen() {
                         {member.name}
                       </span>
                       {member.role === "admin" && (
-                        <span className="dm-badge dm-badge-emerald">
-                          অ্যাডমিন
-                        </span>
+                        <span className="dm-meta-tag">অ্যাডমিন</span>
                       )}
                       {!member.active && (
                         <span className="dm-badge dm-badge-rose">
