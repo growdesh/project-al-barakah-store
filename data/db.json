@@ -1,0 +1,1047 @@
+{
+  "store": {
+    "name": "আল-বারাকাহ স্টোর",
+    "subtitle": "পাইকারি ব্যবসা ব্যবস্থাপনা",
+    "address": "চকবাজার, ঢাকা",
+    "phone": "01806476652",
+    "ownerName": "আল-বারাকাহ অ্যাডমিন",
+    "initials": "AB"
+  },
+  "settings": {
+    "invoicePrefix": "ABS",
+    "invoiceFooter": "আল-বারাকাহ স্টোর · নগদ ও বাকি পাইকারি চালান",
+    "allowNegativeStock": false
+  },
+  "openingCash": 250000,
+  "users": [
+    {
+      "id": "usr-admin",
+      "name": "আল-বারাকাহ অ্যাডমিন",
+      "phone": "01806476652",
+      "password": "01806476652",
+      "role": "admin",
+      "active": true,
+      "note": "স্বত্বাধিকারী ও মূল অ্যাডমিন",
+      "createdAt": "2026-10-09T03:00:00.000Z"
+    },
+    {
+      "id": "usr-staff-1",
+      "name": "মো. রাশেদুল ইসলাম",
+      "phone": "01806476653",
+      "password": "01806476653",
+      "role": "staff",
+      "active": true,
+      "note": "পাইকারি বিক্রয় প্রতিনিধি",
+      "createdAt": "2026-10-19T03:30:00.000Z"
+    },
+    {
+      "id": "usr-staff-2",
+      "name": "মো. কামরুল হাসান",
+      "phone": "01806476654",
+      "password": "01806476654",
+      "role": "staff",
+      "active": true,
+      "note": "কাউন্টার ও কালেকশন স্টাফ",
+      "createdAt": "2026-10-29T04:00:00.000Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-1",
+      "name": "মিনিকেট চাল ৫০ কেজি বস্তা",
+      "sku": "ABS-1001",
+      "barcode": "8942200200101",
+      "category": "চাল ও ডাল",
+      "unit": "বস্তা",
+      "purchaseRate": 3250,
+      "saleRate": 3480,
+      "stock": 145,
+      "minStock": 30
+    },
+    {
+      "id": "prod-2",
+      "name": "নাজিরশাইল প্রিমিয়াম চাল ৫০ কেজি",
+      "sku": "ABS-1002",
+      "barcode": "8942200200102",
+      "category": "চাল ও ডাল",
+      "unit": "বস্তা",
+      "purchaseRate": 3580,
+      "saleRate": 3820,
+      "stock": 88,
+      "minStock": 25
+    },
+    {
+      "id": "prod-3",
+      "name": "তীর সয়াবিন তেল (৪x৫ লিটার কার্টন)",
+      "sku": "ABS-1003",
+      "barcode": "8942200200103",
+      "category": "ভোজ্যতেল",
+      "unit": "কার্টন",
+      "purchaseRate": 3240,
+      "saleRate": 3420,
+      "stock": 62,
+      "minStock": 15
+    },
+    {
+      "id": "prod-4",
+      "name": "ফ্রেশ পাম অয়েল (১৬ লিটার ড্রাম)",
+      "sku": "ABS-1004",
+      "barcode": "8942200200104",
+      "category": "ভোজ্যতেল",
+      "unit": "ড্রাম",
+      "purchaseRate": 2290,
+      "saleRate": 2450,
+      "stock": 14,
+      "minStock": 20
+    },
+    {
+      "id": "prod-5",
+      "name": "দেশি মসুর ডাল ৫০ কেজি বস্তা",
+      "sku": "ABS-1005",
+      "barcode": "8942200200105",
+      "category": "চাল ও ডাল",
+      "unit": "বস্তা",
+      "purchaseRate": 5750,
+      "saleRate": 6150,
+      "stock": 38,
+      "minStock": 12
+    },
+    {
+      "id": "prod-6",
+      "name": "ফ্রেশ রিফাইন্ড চিনি ৫০ কেজি",
+      "sku": "ABS-1006",
+      "barcode": "8942200200106",
+      "category": "চিনি ও আটা",
+      "unit": "বস্তা",
+      "purchaseRate": 5950,
+      "saleRate": 6320,
+      "stock": 52,
+      "minStock": 15
+    },
+    {
+      "id": "prod-7",
+      "name": "তীর আটা ২ কেজি (২০ প্যাক বস্তা)",
+      "sku": "ABS-1007",
+      "barcode": "8942200200107",
+      "category": "চিনি ও আটা",
+      "unit": "বস্তা",
+      "purchaseRate": 1860,
+      "saleRate": 2020,
+      "stock": 74,
+      "minStock": 20
+    },
+    {
+      "id": "prod-8",
+      "name": "প্রাণ ম্যাঙ্গো জুস ২৫০ মিলি (২৪ পিস)",
+      "sku": "ABS-1008",
+      "barcode": "8942200200108",
+      "category": "প্যাকেজড পণ্য",
+      "unit": "কার্টন",
+      "purchaseRate": 540,
+      "saleRate": 590,
+      "stock": 110,
+      "minStock": 30
+    },
+    {
+      "id": "prod-9",
+      "name": "লাক্স সাবান (৭২ পিস কার্টন)",
+      "sku": "ABS-1009",
+      "barcode": "8942200200109",
+      "category": "প্যাকেজড পণ্য",
+      "unit": "কার্টন",
+      "purchaseRate": 3880,
+      "saleRate": 4180,
+      "stock": 9,
+      "minStock": 12
+    },
+    {
+      "id": "prod-10",
+      "name": "রাঁধুনি মিক্স মশলা ডজন প্যাক",
+      "sku": "ABS-1010",
+      "barcode": "8942200200110",
+      "category": "মশলা ও লবণ",
+      "unit": "ডজন",
+      "purchaseRate": 980,
+      "saleRate": 1090,
+      "stock": 64,
+      "minStock": 15
+    },
+    {
+      "id": "prod-11",
+      "name": "মোল্লা সুপার সল্ট ২৫ কেজি বস্তা",
+      "sku": "ABS-1011",
+      "barcode": "8942200200111",
+      "category": "মশলা ও লবণ",
+      "unit": "বস্তা",
+      "purchaseRate": 780,
+      "saleRate": 875,
+      "stock": 95,
+      "minStock": 25
+    },
+    {
+      "id": "prod-12",
+      "name": "বসুন্ধরা টিস্যু (৪৮ বক্স কার্টন)",
+      "sku": "ABS-1012",
+      "barcode": "8942200200112",
+      "category": "প্যাকেজড পণ্য",
+      "unit": "কার্টন",
+      "purchaseRate": 2150,
+      "saleRate": 2340,
+      "stock": 0,
+      "minStock": 10
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust-1",
+      "name": "বিসমিল্লাহ ভ্যারাইটিজ স্টোর",
+      "mobile": "01712340101",
+      "area": "চকবাজার, ঢাকা",
+      "openingDue": 5000,
+      "due": 16900,
+      "createdAt": "2026-10-24T04:00:00.000Z"
+    },
+    {
+      "id": "cust-2",
+      "name": "আমানত গ্রোসারি মার্ট",
+      "mobile": "01812340102",
+      "area": "মোহাম্মদপুর, ঢাকা",
+      "openingDue": 0,
+      "due": 10000,
+      "createdAt": "2026-10-26T05:15:00.000Z"
+    },
+    {
+      "id": "cust-3",
+      "name": "মদিনা বাজার ডিপার্টমেন্টাল",
+      "mobile": "01912340103",
+      "area": "মিরপুর-১, ঢাকা",
+      "openingDue": 3500,
+      "due": 14260,
+      "createdAt": "2026-10-30T06:00:00.000Z"
+    },
+    {
+      "id": "cust-4",
+      "name": "সততা সুপার স্টোর",
+      "mobile": "01612340104",
+      "area": "উত্তরা, ঢাকা",
+      "openingDue": 0,
+      "due": 0,
+      "createdAt": "2026-11-01T08:00:00.000Z"
+    },
+    {
+      "id": "cust-5",
+      "name": "নিউ ঢাকা ট্রেডার্স",
+      "mobile": "01712340105",
+      "area": "যাত্রাবাড়ী, ঢাকা",
+      "openingDue": 0,
+      "due": 10500,
+      "createdAt": "2026-11-04T09:20:00.000Z"
+    },
+    {
+      "id": "cust-6",
+      "name": "হাজী এন্টারপ্রাইজ",
+      "mobile": "01812340106",
+      "area": "কেরানীগঞ্জ, ঢাকা",
+      "openingDue": 0,
+      "due": 0,
+      "createdAt": "2026-11-05T04:45:00.000Z"
+    },
+    {
+      "id": "cust-7",
+      "name": "রহিম জেনারেল স্টোর",
+      "mobile": "01912340107",
+      "area": "সাভার, ঢাকা",
+      "openingDue": 2000,
+      "due": 27570,
+      "createdAt": "2026-11-08T10:00:00.000Z"
+    },
+    {
+      "id": "cust-8",
+      "name": "আশুলিয়া বাজার স্টোর",
+      "mobile": "01712340108",
+      "area": "আশুলিয়া, ঢাকা",
+      "openingDue": 0,
+      "due": 0,
+      "createdAt": "2026-11-11T05:30:00.000Z"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "sup-1",
+      "name": "সিটি গ্রুপ",
+      "mobile": "01700991101",
+      "area": "তেজগাঁও, ঢাকা",
+      "due": 17200,
+      "lastTxn": "২২ নভেম্বর"
+    },
+    {
+      "id": "sup-2",
+      "name": "নূরজাহান রাইস মিল",
+      "mobile": "01700991102",
+      "area": "শেরপুর, বগুড়া",
+      "due": 32500,
+      "lastTxn": "২০ নভেম্বর"
+    },
+    {
+      "id": "sup-3",
+      "name": "মেঘনা এডিবল অয়েল",
+      "mobile": "01700991103",
+      "area": "সোনারগাঁও, নারায়ণগঞ্জ",
+      "due": 0,
+      "lastTxn": "১৮ নভেম্বর"
+    },
+    {
+      "id": "sup-4",
+      "name": "প্রাণ ডিস্ট্রিবিউশন",
+      "mobile": "01700991104",
+      "area": "বাড্ডা, ঢাকা",
+      "due": 0,
+      "lastTxn": "১৫ নভেম্বর"
+    },
+    {
+      "id": "sup-5",
+      "name": "বসুন্ধরা কনজ্যুমার প্রোডাক্টস",
+      "mobile": "01700991105",
+      "area": "বসুন্ধরা, ঢাকা",
+      "due": 13000,
+      "lastTxn": "১১ নভেম্বর"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv-2",
+      "number": "ABS-0108",
+      "date": "2026-11-23T09:10:00.000Z",
+      "customerId": "cust-6",
+      "customerName": "হাজী এন্টারপ্রাইজ",
+      "customerMobile": "01812340106",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "মিনিকেট চাল ৫০ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 10,
+          "rate": 3480,
+          "purchaseRate": 3250,
+          "total": 34800
+        },
+        {
+          "productId": "prod-11",
+          "name": "মোল্লা সুপার সল্ট ২৫ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 10,
+          "rate": 875,
+          "purchaseRate": 780,
+          "total": 8750
+        }
+      ],
+      "itemsCount": 20,
+      "subTotal": 43550,
+      "discount": 550,
+      "total": 43000,
+      "initialPaid": 43000,
+      "paid": 43000,
+      "due": 0,
+      "status": "paid",
+      "note": "সম্পূর্ণ নগদ পরিশোধ"
+    },
+    {
+      "id": "inv-1",
+      "number": "ABS-0109",
+      "date": "2026-11-23T05:30:00.000Z",
+      "customerId": "cust-1",
+      "customerName": "বিসমিল্লাহ ভ্যারাইটিজ স্টোর",
+      "customerMobile": "01712340101",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "মিনিকেট চাল ৫০ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 10,
+          "rate": 3480,
+          "purchaseRate": 3250,
+          "total": 34800
+        },
+        {
+          "productId": "prod-3",
+          "name": "তীর সয়াবিন তেল (৪x৫ লিটার কার্টন)",
+          "unit": "কার্টন",
+          "qty": 5,
+          "rate": 3420,
+          "purchaseRate": 3240,
+          "total": 17100
+        }
+      ],
+      "itemsCount": 15,
+      "subTotal": 51900,
+      "discount": 0,
+      "total": 51900,
+      "initialPaid": 40000,
+      "paid": 40000,
+      "due": 11900,
+      "status": "partial",
+      "note": "সকালের পাইকারি চালান"
+    },
+    {
+      "id": "inv-3",
+      "number": "ABS-0107",
+      "date": "2026-11-22T10:40:00.000Z",
+      "customerId": "cust-2",
+      "customerName": "আমানত গ্রোসারি মার্ট",
+      "customerMobile": "01812340102",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "items": [
+        {
+          "productId": "prod-6",
+          "name": "ফ্রেশ রিফাইন্ড চিনি ৫০ কেজি",
+          "unit": "বস্তা",
+          "qty": 6,
+          "rate": 6320,
+          "purchaseRate": 5950,
+          "total": 37920
+        },
+        {
+          "productId": "prod-8",
+          "name": "প্রাণ ম্যাঙ্গো জুস ২৫০ মিলি (২৪ পিস)",
+          "unit": "কার্টন",
+          "qty": 12,
+          "rate": 590,
+          "purchaseRate": 540,
+          "total": 7080
+        }
+      ],
+      "itemsCount": 18,
+      "subTotal": 45000,
+      "discount": 0,
+      "total": 45000,
+      "initialPaid": 25000,
+      "paid": 35000,
+      "due": 10000,
+      "status": "partial"
+    },
+    {
+      "id": "inv-4",
+      "number": "ABS-0106",
+      "date": "2026-11-21T08:20:00.000Z",
+      "customerId": "cust-3",
+      "customerName": "মদিনা বাজার ডিপার্টমেন্টাল",
+      "customerMobile": "01912340103",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "items": [
+        {
+          "productId": "prod-2",
+          "name": "নাজিরশাইল প্রিমিয়াম চাল ৫০ কেজি",
+          "unit": "বস্তা",
+          "qty": 8,
+          "rate": 3820,
+          "purchaseRate": 3580,
+          "total": 30560
+        },
+        {
+          "productId": "prod-7",
+          "name": "তীর আটা ২ কেজি (২০ প্যাক বস্তা)",
+          "unit": "বস্তা",
+          "qty": 10,
+          "rate": 2020,
+          "purchaseRate": 1860,
+          "total": 20200
+        }
+      ],
+      "itemsCount": 18,
+      "subTotal": 50760,
+      "discount": 0,
+      "total": 50760,
+      "initialPaid": 30000,
+      "paid": 40000,
+      "due": 10760,
+      "status": "partial"
+    },
+    {
+      "id": "inv-5",
+      "number": "ABS-0105",
+      "date": "2026-11-20T05:15:00.000Z",
+      "customerId": "cust-4",
+      "customerName": "সততা সুপার স্টোর",
+      "customerMobile": "01612340104",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "items": [
+        {
+          "productId": "prod-5",
+          "name": "দেশি মসুর ডাল ৫০ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 5,
+          "rate": 6150,
+          "purchaseRate": 5750,
+          "total": 30750
+        },
+        {
+          "productId": "prod-11",
+          "name": "মোল্লা সুপার সল্ট ২৫ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 15,
+          "rate": 875,
+          "purchaseRate": 780,
+          "total": 13125
+        }
+      ],
+      "itemsCount": 20,
+      "subTotal": 43875,
+      "discount": 0,
+      "total": 43875,
+      "initialPaid": 20000,
+      "paid": 43875,
+      "due": 0,
+      "status": "paid"
+    },
+    {
+      "id": "inv-6",
+      "number": "ABS-0104",
+      "date": "2026-11-19T11:05:00.000Z",
+      "customerId": "cust-5",
+      "customerName": "নিউ ঢাকা ট্রেডার্স",
+      "customerMobile": "01712340105",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "items": [
+        {
+          "productId": "prod-4",
+          "name": "ফ্রেশ পাম অয়েল (১৬ লিটার ড্রাম)",
+          "unit": "ড্রাম",
+          "qty": 8,
+          "rate": 2450,
+          "purchaseRate": 2290,
+          "total": 19600
+        },
+        {
+          "productId": "prod-10",
+          "name": "রাঁধুনি মিক্স মশলা ডজন প্যাক",
+          "unit": "ডজন",
+          "qty": 10,
+          "rate": 1090,
+          "purchaseRate": 980,
+          "total": 10900
+        }
+      ],
+      "itemsCount": 18,
+      "subTotal": 30500,
+      "discount": 0,
+      "total": 30500,
+      "initialPaid": 15000,
+      "paid": 20000,
+      "due": 10500,
+      "status": "partial"
+    },
+    {
+      "id": "inv-7",
+      "number": "ABS-0103",
+      "date": "2026-11-18T07:50:00.000Z",
+      "customerId": "cust-6",
+      "customerName": "হাজী এন্টারপ্রাইজ",
+      "customerMobile": "01812340106",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "মিনিকেট চাল ৫০ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 15,
+          "rate": 3480,
+          "purchaseRate": 3250,
+          "total": 52200
+        }
+      ],
+      "itemsCount": 15,
+      "subTotal": 52200,
+      "discount": 0,
+      "total": 52200,
+      "initialPaid": 52200,
+      "paid": 52200,
+      "due": 0,
+      "status": "paid"
+    },
+    {
+      "id": "inv-8",
+      "number": "ABS-0102",
+      "date": "2026-11-17T09:30:00.000Z",
+      "customerId": "cust-7",
+      "customerName": "রহিম জেনারেল স্টোর",
+      "customerMobile": "01912340107",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "items": [
+        {
+          "productId": "prod-9",
+          "name": "লাক্স সাবান (৭২ পিস কার্টন)",
+          "unit": "কার্টন",
+          "qty": 4,
+          "rate": 4180,
+          "purchaseRate": 3880,
+          "total": 16720
+        },
+        {
+          "productId": "prod-8",
+          "name": "প্রাণ ম্যাঙ্গো জুস ২৫০ মিলি (২৪ পিস)",
+          "unit": "কার্টন",
+          "qty": 15,
+          "rate": 590,
+          "purchaseRate": 540,
+          "total": 8850
+        }
+      ],
+      "itemsCount": 19,
+      "subTotal": 25570,
+      "discount": 0,
+      "total": 25570,
+      "initialPaid": 0,
+      "paid": 0,
+      "due": 25570,
+      "status": "due",
+      "note": "সাপ্তাহিক বাকিতে চালান"
+    },
+    {
+      "id": "inv-9",
+      "number": "ABS-0101",
+      "date": "2026-11-14T06:20:00.000Z",
+      "customerId": "cust-8",
+      "customerName": "আশুলিয়া বাজার স্টোর",
+      "customerMobile": "01712340108",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "items": [
+        {
+          "productId": "prod-3",
+          "name": "তীর সয়াবিন তেল (৪x৫ লিটার কার্টন)",
+          "unit": "কার্টন",
+          "qty": 10,
+          "rate": 3420,
+          "purchaseRate": 3240,
+          "total": 34200
+        }
+      ],
+      "itemsCount": 10,
+      "subTotal": 34200,
+      "discount": 0,
+      "total": 34200,
+      "initialPaid": 20000,
+      "paid": 34200,
+      "due": 0,
+      "status": "paid"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "pur-1",
+      "number": "PUR-ABS-0104",
+      "date": "2026-11-22T04:00:00.000Z",
+      "supplierId": "sup-1",
+      "supplierName": "সিটি গ্রুপ",
+      "supplierMobile": "01700991101",
+      "items": [
+        {
+          "productId": "prod-3",
+          "name": "তীর সয়াবিন তেল (৪x৫ লিটার কার্টন)",
+          "unit": "কার্টন",
+          "qty": 30,
+          "rate": 3240,
+          "purchaseRate": 3240,
+          "total": 97200
+        }
+      ],
+      "itemsCount": 30,
+      "subTotal": 97200,
+      "discount": 0,
+      "total": 97200,
+      "paid": 80000,
+      "due": 17200,
+      "status": "partial",
+      "note": "সয়াবিন তেল মজুদ ক্রয়"
+    },
+    {
+      "id": "pur-2",
+      "number": "PUR-ABS-0103",
+      "date": "2026-11-20T05:30:00.000Z",
+      "supplierId": "sup-2",
+      "supplierName": "নূরজাহান রাইস মিল",
+      "supplierMobile": "01700991102",
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "মিনিকেট চাল ৫০ কেজি বস্তা",
+          "unit": "বস্তা",
+          "qty": 50,
+          "rate": 3250,
+          "purchaseRate": 3250,
+          "total": 162500
+        }
+      ],
+      "itemsCount": 50,
+      "subTotal": 162500,
+      "discount": 0,
+      "total": 162500,
+      "paid": 130000,
+      "due": 32500,
+      "status": "partial",
+      "note": "মিনিকেট চাল ট্রাক লোড"
+    },
+    {
+      "id": "pur-3",
+      "number": "PUR-ABS-0102",
+      "date": "2026-11-18T09:15:00.000Z",
+      "supplierId": "sup-3",
+      "supplierName": "মেঘনা এডিবল অয়েল",
+      "supplierMobile": "01700991103",
+      "items": [
+        {
+          "productId": "prod-6",
+          "name": "ফ্রেশ রিফাইন্ড চিনি ৫০ কেজি",
+          "unit": "বস্তা",
+          "qty": 20,
+          "rate": 5950,
+          "purchaseRate": 5950,
+          "total": 119000
+        }
+      ],
+      "itemsCount": 20,
+      "subTotal": 119000,
+      "discount": 0,
+      "total": 119000,
+      "paid": 119000,
+      "due": 0,
+      "status": "paid"
+    },
+    {
+      "id": "pur-4",
+      "number": "PUR-ABS-0101",
+      "date": "2026-11-15T08:10:00.000Z",
+      "supplierId": "sup-4",
+      "supplierName": "প্রাণ ডিস্ট্রিবিউশন",
+      "supplierMobile": "01700991104",
+      "items": [
+        {
+          "productId": "prod-8",
+          "name": "প্রাণ ম্যাঙ্গো জুস ২৫০ মিলি (২৪ পিস)",
+          "unit": "কার্টন",
+          "qty": 60,
+          "rate": 540,
+          "purchaseRate": 540,
+          "total": 32400
+        }
+      ],
+      "itemsCount": 60,
+      "subTotal": 32400,
+      "discount": 0,
+      "total": 32400,
+      "paid": 32400,
+      "due": 0,
+      "status": "paid"
+    }
+  ],
+  "collections": [
+    {
+      "id": "col-5",
+      "receiptNo": "COL-0105",
+      "date": "2026-11-23T06:45:00.000Z",
+      "customerId": "cust-2",
+      "customerName": "আমানত গ্রোসারি মার্ট",
+      "customerMobile": "01812340102",
+      "invoiceId": "inv-3",
+      "invoiceNumber": "ABS-0107",
+      "amount": 10000,
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "note": "আংশিক বকেয়া নগদ আদায়"
+    },
+    {
+      "id": "col-4",
+      "receiptNo": "COL-0104",
+      "date": "2026-11-22T07:15:00.000Z",
+      "customerId": "cust-3",
+      "customerName": "মদিনা বাজার ডিপার্টমেন্টাল",
+      "customerMobile": "01912340103",
+      "invoiceId": "inv-4",
+      "invoiceNumber": "ABS-0106",
+      "amount": 10000,
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "note": "বকেয়া কিস্তি জমা"
+    },
+    {
+      "id": "col-3",
+      "receiptNo": "COL-0103",
+      "date": "2026-11-21T10:10:00.000Z",
+      "customerId": "cust-4",
+      "customerName": "সততা সুপার স্টোর",
+      "customerMobile": "01612340104",
+      "invoiceId": "inv-5",
+      "invoiceNumber": "ABS-0105",
+      "amount": 23875,
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "note": "পূর্ণ বকেয়া পরিশোধ"
+    },
+    {
+      "id": "col-2",
+      "receiptNo": "COL-0102",
+      "date": "2026-11-21T05:50:00.000Z",
+      "customerId": "cust-5",
+      "customerName": "নিউ ঢাকা ট্রেডার্স",
+      "customerMobile": "01712340105",
+      "invoiceId": "inv-6",
+      "invoiceNumber": "ABS-0104",
+      "amount": 5000,
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "note": "কাউন্টার নগদ আদায়"
+    },
+    {
+      "id": "col-1",
+      "receiptNo": "COL-0101",
+      "date": "2026-11-19T09:00:00.000Z",
+      "customerId": "cust-8",
+      "customerName": "আশুলিয়া বাজার স্টোর",
+      "customerMobile": "01712340108",
+      "invoiceId": "inv-9",
+      "invoiceNumber": "ABS-0101",
+      "amount": 14200,
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "note": "চালান সম্পূর্ণ পরিশোধ"
+    }
+  ],
+  "ledger": [
+    {
+      "id": "led-2",
+      "date": "2026-11-23T09:10:00.000Z",
+      "party": "হাজী এন্টারপ্রাইজ",
+      "amount": 43000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "refId": "inv-2",
+      "note": "চালান #ABS-0108 নগদ বিক্রি"
+    },
+    {
+      "id": "led-9",
+      "date": "2026-11-23T06:45:00.000Z",
+      "party": "আমানত গ্রোসারি মার্ট",
+      "amount": 10000,
+      "direction": "in",
+      "kind": "collection",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "refId": "col-5",
+      "note": "COL-0105 · ABS-0107"
+    },
+    {
+      "id": "led-1",
+      "date": "2026-11-23T05:30:00.000Z",
+      "party": "বিসমিল্লাহ ভ্যারাইটিজ স্টোর",
+      "amount": 40000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "refId": "inv-1",
+      "note": "চালান #ABS-0109 নগদ বিক্রি"
+    },
+    {
+      "id": "led-3",
+      "date": "2026-11-22T10:40:00.000Z",
+      "party": "আমানত গ্রোসারি মার্ট",
+      "amount": 25000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "inv-3",
+      "note": "চালান #ABS-0107 নগদ বিক্রি"
+    },
+    {
+      "id": "led-10",
+      "date": "2026-11-22T07:15:00.000Z",
+      "party": "মদিনা বাজার ডিপার্টমেন্টাল",
+      "amount": 10000,
+      "direction": "in",
+      "kind": "collection",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "refId": "col-4",
+      "note": "COL-0104 · ABS-0106"
+    },
+    {
+      "id": "led-14",
+      "date": "2026-11-22T04:00:00.000Z",
+      "party": "সিটি গ্রুপ",
+      "amount": 80000,
+      "direction": "out",
+      "kind": "purchase",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "pur-1",
+      "note": "ক্রয় চালান #PUR-ABS-0104 নগদ পরিশোধ"
+    },
+    {
+      "id": "led-18",
+      "date": "2026-11-21T11:15:00.000Z",
+      "party": "গুদাম ভাড়া ও লেবার",
+      "amount": 18500,
+      "direction": "out",
+      "kind": "expense",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "note": "মাসিক গুদাম ভাড়া ও লোডিং-আনলোডিং"
+    },
+    {
+      "id": "led-11",
+      "date": "2026-11-21T10:10:00.000Z",
+      "party": "সততা সুপার স্টোর",
+      "amount": 23875,
+      "direction": "in",
+      "kind": "collection",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "refId": "col-3",
+      "note": "COL-0103 · ABS-0105"
+    },
+    {
+      "id": "led-4",
+      "date": "2026-11-21T08:20:00.000Z",
+      "party": "মদিনা বাজার ডিপার্টমেন্টাল",
+      "amount": 30000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "refId": "inv-4",
+      "note": "চালান #ABS-0106 নগদ বিক্রি"
+    },
+    {
+      "id": "led-12",
+      "date": "2026-11-21T05:50:00.000Z",
+      "party": "নিউ ঢাকা ট্রেডার্স",
+      "amount": 5000,
+      "direction": "in",
+      "kind": "collection",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "col-2",
+      "note": "COL-0102 · ABS-0104"
+    },
+    {
+      "id": "led-15",
+      "date": "2026-11-20T05:30:00.000Z",
+      "party": "নূরজাহান রাইস মিল",
+      "amount": 130000,
+      "direction": "out",
+      "kind": "purchase",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "pur-2",
+      "note": "ক্রয় চালান #PUR-ABS-0103 নগদ পরিশোধ"
+    },
+    {
+      "id": "led-5",
+      "date": "2026-11-20T05:15:00.000Z",
+      "party": "সততা সুপার স্টোর",
+      "amount": 20000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-staff-2",
+      "staffName": "মো. কামরুল হাসান",
+      "refId": "inv-5",
+      "note": "চালান #ABS-0105 নগদ বিক্রি"
+    },
+    {
+      "id": "led-19",
+      "date": "2026-11-19T12:00:00.000Z",
+      "party": "পরিবহন খরচ (ট্রাক ভাড়া)",
+      "amount": 9500,
+      "direction": "out",
+      "kind": "expense",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "note": "বগুড়া থেকে চাল পরিবহন"
+    },
+    {
+      "id": "led-6",
+      "date": "2026-11-19T11:05:00.000Z",
+      "party": "নিউ ঢাকা ট্রেডার্স",
+      "amount": 15000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "refId": "inv-6",
+      "note": "চালান #ABS-0104 নগদ বিক্রি"
+    },
+    {
+      "id": "led-13",
+      "date": "2026-11-19T09:00:00.000Z",
+      "party": "আশুলিয়া বাজার স্টোর",
+      "amount": 14200,
+      "direction": "in",
+      "kind": "collection",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "refId": "col-1",
+      "note": "COL-0101 · ABS-0101"
+    },
+    {
+      "id": "led-16",
+      "date": "2026-11-18T09:15:00.000Z",
+      "party": "মেঘনা এডিবল অয়েল",
+      "amount": 119000,
+      "direction": "out",
+      "kind": "purchase",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "pur-3",
+      "note": "ক্রয় চালান #PUR-ABS-0102 নগদ পরিশোধ"
+    },
+    {
+      "id": "led-7",
+      "date": "2026-11-18T07:50:00.000Z",
+      "party": "হাজী এন্টারপ্রাইজ",
+      "amount": 52200,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "inv-7",
+      "note": "চালান #ABS-0103 নগদ বিক্রি"
+    },
+    {
+      "id": "led-17",
+      "date": "2026-11-15T08:10:00.000Z",
+      "party": "প্রাণ ডিস্ট্রিবিউশন",
+      "amount": 32400,
+      "direction": "out",
+      "kind": "purchase",
+      "staffId": "usr-admin",
+      "staffName": "আল-বারাকাহ অ্যাডমিন",
+      "refId": "pur-4",
+      "note": "ক্রয় চালান #PUR-ABS-0101 নগদ পরিশোধ"
+    },
+    {
+      "id": "led-8",
+      "date": "2026-11-14T06:20:00.000Z",
+      "party": "আশুলিয়া বাজার স্টোর",
+      "amount": 20000,
+      "direction": "in",
+      "kind": "sale",
+      "staffId": "usr-staff-1",
+      "staffName": "মো. রাশেদুল ইসলাম",
+      "refId": "inv-9",
+      "note": "চালান #ABS-0101 নগদ বিক্রি"
+    }
+  ]
+}
