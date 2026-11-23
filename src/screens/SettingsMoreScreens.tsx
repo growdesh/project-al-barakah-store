@@ -21,7 +21,7 @@ import {
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { PWAInstallButton } from "../components/PWAInstallButton";
 import { useApp } from "../context/AppContext";
-import { api, getStoredToken } from "../lib/api";
+import { api } from "../lib/api";
 import { normalizePhone, toBn } from "../lib/format";
 import { navigate } from "../lib/router";
 
@@ -192,19 +192,7 @@ export function SettingsScreen() {
   const handleDownloadBackup = async () => {
     setDownloadingBackup(true);
     try {
-      const token = getStoredToken();
-      const headers = new Headers();
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      const res = await fetch(api.downloadBackupUrl(), {
-        headers,
-        credentials: "include",
-      });
-      if (!res.ok) {
-        throw new Error("ডাটা ব্যাকআপ ডাউনলোড ব্যর্থ হয়েছে");
-      }
-      const blob = await res.blob();
+      const blob = await api.downloadBackupBlob();
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;

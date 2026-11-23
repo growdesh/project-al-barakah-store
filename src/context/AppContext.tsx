@@ -70,6 +70,7 @@ function clearBootstrapCache(): void {
 }
 
 function ensureOnline(): void {
+  if (api.isLocalMode()) return;
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     throw new Error(
       "আপনি এখন অফলাইনে আছেন। নতুন এন্ট্রি সংরক্ষণের জন্য ইন্টারনেট সংযোগ চালু করুন।",
