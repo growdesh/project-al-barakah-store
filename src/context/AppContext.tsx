@@ -39,7 +39,7 @@ import type {
   Supplier,
 } from "../types";
 
-const BOOTSTRAP_CACHE_KEY = "ab_bootstrap_cache_v1";
+const BOOTSTRAP_CACHE_KEY = "ab_bootstrap_cache_v2";
 
 function saveBootstrapCache(payload: BootstrapPayload): void {
   try {
