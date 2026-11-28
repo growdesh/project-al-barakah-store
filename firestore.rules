@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// WARNING: These Firestore rules are intentionally open for this version because
+// the app uses simple Firestore-based mobile number + password login without
+// Firebase Auth/OTP (as requested). Tighten these rules later by migrating to
+// Firebase Authentication (or custom auth tokens) and enforcing role-based checks.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /meta/{docId} {
+      allow read, write: if true;
+    }
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+    match /products/{productId} {
+      allow read, write: if true;
+    }
+    match /customers/{customerId} {
+      allow read, write: if true;
+    }
+    match /suppliers/{supplierId} {
+      allow read, write: if true;
+    }
+    match /invoices/{invoiceId} {
+      allow read, write: if true;
+    }
+    match /purchases/{purchaseId} {
+      allow read, write: if true;
+    }
+    match /collections/{collectionId} {
+      allow read, write: if true;
+    }
+    match /ledger/{ledgerId} {
+      allow read, write: if true;
+    }
+    match /handovers/{handoverId} {
+      allow read, write: if true;
+    }
+    match /staffCash/{staffId} {
+      allow read, write: if true;
+    }
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}

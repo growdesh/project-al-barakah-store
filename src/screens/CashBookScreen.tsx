@@ -24,15 +24,21 @@ type LedgerFilter =
   | "all"
   | "sale"
   | "collection"
+  | "staff_handover"
   | "purchase_pay"
   | "expense";
 
-function kindMeta(kind: CashLedgerKind) {
+function kindMeta(kind: CashLedgerKind, category?: string) {
   switch (kind) {
     case "sale":
       return { label: "নগদ বিক্রি", cls: "dm-badge dm-badge-emerald" };
     case "collection":
       return { label: "বাকি আদায়", cls: "dm-badge dm-badge-blue" };
+    case "staff_handover":
+      return {
+        label: category || "স্টাফ থেকে টাকা গ্রহণ",
+        cls: "dm-badge dm-badge-teal",
+      };
     case "purchase":
       return { label: "পণ্য ক্রয়", cls: "dm-badge dm-badge-amber" };
     case "supplier_payment":
@@ -98,6 +104,7 @@ export function CashBookScreen() {
       if (filter === "all") return true;
       if (filter === "sale") return entry.kind === "sale";
       if (filter === "collection") return entry.kind === "collection";
+      if (filter === "staff_handover") return entry.kind === "staff_handover";
       if (filter === "purchase_pay") {
         return entry.kind === "purchase" || entry.kind === "supplier_payment";
       }
@@ -241,10 +248,10 @@ export function CashBookScreen() {
           </span>
           <span className="dm-kpi-meta">
             <span className="dm-kpi-label">বর্তমান নগদ ক্যাশ</span>
-            <span className="dm-kpi-value dm-text-emerald">
+            <span className="dm-kpi-value dm-text-emerald dm-num">
               {formatMoneyBn(metrics.currentCash)}
             </span>
-            <span className="dm-kpi-sub">
+            <span className="dm-kpi-sub dm-num">
               প্রারম্ভিক ক্যাশ: {formatMoneyBn(metrics.openingCash)}
             </span>
           </span>
@@ -256,7 +263,7 @@ export function CashBookScreen() {
           </span>
           <span className="dm-kpi-meta">
             <span className="dm-kpi-label">মোট নগদ জমা</span>
-            <span className="dm-kpi-value dm-text-emerald">
+            <span className="dm-kpi-value dm-text-emerald dm-num">
               {formatMoneyBn(metrics.totalCashIn)}
             </span>
           </span>
@@ -268,7 +275,7 @@ export function CashBookScreen() {
           </span>
           <span className="dm-kpi-meta">
             <span className="dm-kpi-label">মোট নগদ খরচ ও পরিশোধ</span>
-            <span className="dm-kpi-value dm-text-rose">
+            <span className="dm-kpi-value dm-text-rose dm-num">
               {formatMoneyBn(metrics.totalCashOut)}
             </span>
           </span>
@@ -280,7 +287,7 @@ export function CashBookScreen() {
           </span>
           <span className="dm-kpi-meta">
             <span className="dm-kpi-label">কাস্টমারের কাছে পাওনা</span>
-            <span className="dm-kpi-value dm-text-blue">
+            <span className="dm-kpi-value dm-text-blue dm-num">
               {formatMoneyBn(metrics.customerDue)}
             </span>
           </span>
@@ -348,6 +355,7 @@ export function CashBookScreen() {
           { id: "all" as const, label: "সব" },
           { id: "sale" as const, label: "বিক্রি" },
           { id: "collection" as const, label: "বাকি আদায়" },
+          { id: "staff_handover" as const, label: "স্টাফ হ্যান্ডওভার" },
           { id: "purchase_pay" as const, label: "ক্রয় ও পরিশোধ" },
           { id: "expense" as const, label: "খরচ" },
         ].map((pill) => (
@@ -373,7 +381,7 @@ export function CashBookScreen() {
         ) : (
           filteredLedger.map((entry) => {
             const isIn = entry.direction === "in";
-            const meta = kindMeta(entry.kind);
+            const meta = kindMeta(entry.kind, entry.category);
             return (
               <article key={entry.id} className="dm-mcard">
                 <div className="dm-mcard-top">
@@ -429,7 +437,7 @@ export function CashBookScreen() {
             ) : (
               filteredLedger.map((entry) => {
                 const isIn = entry.direction === "in";
-                const meta = kindMeta(entry.kind);
+                const meta = kindMeta(entry.kind, entry.category);
                 return (
                   <tr key={entry.id}>
                     <td>

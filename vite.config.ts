@@ -76,40 +76,19 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api\//, /^\/robots\.txt$/],
+        globPatterns: ["logo.svg"],
+        navigateFallback: null,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
+            urlPattern: ({ request }) => request.mode === "navigate",
             handler: "NetworkOnly",
           },
           {
-            urlPattern: /\.(?:woff2|woff)$/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "local-fonts-cache",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            urlPattern: /\.(?:png|svg|ico|webp)$/i,
-            handler: "StaleWhileRevalidate",
-            options: {
-              cacheName: "static-media-cache",
-              expiration: {
-                maxEntries: 40,
-                maxAgeSeconds: 60 * 60 * 24 * 30,
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
+            urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
+            handler: "NetworkOnly",
           },
         ],
       },
@@ -142,6 +121,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ["react", "react-dom", "lucide-react"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
         },
       },
     },

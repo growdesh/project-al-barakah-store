@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   FileText,
+  KeyRound,
   LogOut,
   Settings,
   ShieldAlert,
@@ -18,7 +19,8 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
+import { ModalDialog } from "../components/ModalDialog";
 import { PWAInstallButton } from "../components/PWAInstallButton";
 import { useApp } from "../context/AppContext";
 import { api } from "../lib/api";
@@ -30,7 +32,7 @@ type SettingsTab = "store" | "invoice" | "password" | "backup";
 /* ─────────────────────────── 1. SettingsScreen ─────────────────────────── */
 
 export function SettingsScreen() {
-  const { user, data, toast, updateSettings } = useApp();
+  const { user, data, toast, updateSettings, changeOwnPassword } = useApp();
 
   const [tab, setTab] = useState<SettingsTab>("store");
 
@@ -61,8 +63,10 @@ export function SettingsScreen() {
   const [savingInvoice, setSavingInvoice] = useState<boolean>(false);
 
   // Tab 3: অ্যাডমিন পাসওয়ার্ড
+  const [oldPassword, setOldPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showOldPwd, setShowOldPwd] = useState<boolean>(false);
   const [showNewPwd, setShowNewPwd] = useState<boolean>(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState<boolean>(false);
   const [pwdError, setPwdError] = useState<string | null>(null);
@@ -158,14 +162,19 @@ export function SettingsScreen() {
     e.preventDefault();
     setPwdError(null);
 
+    const current = oldPassword.trim();
     const next = newPassword.trim();
     const confirm = confirmPassword.trim();
+    if (!current) {
+      setPwdError("বর্তমান পাসওয়ার্ড লিখুন");
+      return;
+    }
     if (!next) {
       setPwdError("নতুন পাসওয়ার্ড লিখুন");
       return;
     }
-    if (next.length < 4) {
-      setPwdError("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে");
+    if (next.length < 6) {
+      setPwdError("নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে");
       return;
     }
     if (next !== confirm) {
@@ -175,9 +184,11 @@ export function SettingsScreen() {
 
     setSavingPwd(true);
     try {
-      await updateSettings({ adminPassword: next });
+      await changeOwnPassword(current, next);
+      setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setShowOldPwd(false);
       setShowNewPwd(false);
       setShowConfirmPwd(false);
     } catch (err) {
@@ -400,15 +411,46 @@ export function SettingsScreen() {
             </div>
           )}
 
+          <div className="dm-field">
+            <label htmlFor="set-old-pwd">বর্তমান পাসওয়ার্ড *</label>
+            <div className="dm-password-wrap">
+              <input
+                id="set-old-pwd"
+                type={showOldPwd ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="বর্তমান পাসওয়ার্ড লিখুন"
+                className="dm-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowOldPwd((v) => !v)}
+                aria-label={
+                  showOldPwd ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"
+                }
+                className="dm-password-toggle"
+              >
+                {showOldPwd ? (
+                  <EyeOff size={18} aria-hidden="true" />
+                ) : (
+                  <Eye size={18} aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+
           <div className="dm-form-row-2">
             <div className="dm-field">
-              <label htmlFor="set-new-pwd">নতুন পাসওয়ার্ড *</label>
+              <label htmlFor="set-new-pwd">নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর) *</label>
               <div className="dm-password-wrap">
                 <input
                   id="set-new-pwd"
                   type={showNewPwd ? "text" : "password"}
                   autoComplete="new-password"
                   required
+                  minLength={6}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="নতুন পাসওয়ার্ড লিখুন"
@@ -439,6 +481,7 @@ export function SettingsScreen() {
                   type={showConfirmPwd ? "text" : "password"}
                   autoComplete="new-password"
                   required
+                  minLength={6}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="পুনরায় পাসওয়ার্ড লিখুন"
@@ -546,7 +589,19 @@ export function SettingsScreen() {
 /* ─────────────────────────── 2. MoreScreen ─────────────────────────── */
 
 export function MoreScreen() {
-  const { user, logout } = useApp();
+  const { user, logout, changeOwnPassword } = useApp();
+
+  const [pwdOpen, setPwdOpen] = useState<boolean>(false);
+  const [oldPwd, setOldPwd] = useState<string>("");
+  const [newPwd, setNewPwd] = useState<string>("");
+  const [confirmPwd, setConfirmPwd] = useState<string>("");
+  const [showOld, setShowOld] = useState<boolean>(false);
+  const [showNew, setShowNew] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [pwdErr, setPwdErr] = useState<string | null>(null);
+  const [savingPwd, setSavingPwd] = useState<boolean>(false);
+
+  const ownPwdFormId = useId();
 
   const modules = useMemo(() => {
     if (!user) return [];
@@ -657,6 +712,51 @@ export function MoreScreen() {
 
   if (!user) return null;
 
+  const openOwnPwdModal = () => {
+    setOldPwd("");
+    setNewPwd("");
+    setConfirmPwd("");
+    setShowOld(false);
+    setShowNew(false);
+    setShowConfirm(false);
+    setPwdErr(null);
+    setPwdOpen(true);
+  };
+
+  const handleOwnPwdSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setPwdErr(null);
+
+    const current = oldPwd.trim();
+    const next = newPwd.trim();
+    const confirm = confirmPwd.trim();
+
+    if (!current) {
+      setPwdErr("বর্তমান পাসওয়ার্ড লিখুন");
+      return;
+    }
+    if (next.length < 6) {
+      setPwdErr("নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে");
+      return;
+    }
+    if (next !== confirm) {
+      setPwdErr("নতুন পাসওয়ার্ড এবং নিশ্চিতকরণ পাসওয়ার্ড মিলছে না");
+      return;
+    }
+
+    setSavingPwd(true);
+    try {
+      await changeOwnPassword(current, next);
+      setPwdOpen(false);
+    } catch (err) {
+      setPwdErr(
+        err instanceof Error ? err.message : "পাসওয়ার্ড পরিবর্তন করা যায়নি",
+      );
+    } finally {
+      setSavingPwd(false);
+    }
+  };
+
   return (
     <div className="dm-stack-md">
       <div className="dm-page-head">
@@ -705,6 +805,16 @@ export function MoreScreen() {
       {/* PWA App Install Card (shown when installable or on iOS Safari) */}
       <PWAInstallButton variant="card" />
 
+      {/* Change Own Password Button (Available to Both Admin & Staff) */}
+      <button
+        type="button"
+        onClick={openOwnPwdModal}
+        className="dm-btn dm-btn-outline dm-btn-full"
+      >
+        <KeyRound size={17} aria-hidden="true" />
+        <span>নিজের পাসওয়ার্ড পরিবর্তন করুন</span>
+      </button>
+
       {/* Clean Logout Button */}
       <button
         type="button"
@@ -714,6 +824,133 @@ export function MoreScreen() {
         <LogOut size={17} aria-hidden="true" />
         <span>লগআউট</span>
       </button>
+
+      {/* Own Password Change Modal */}
+      <ModalDialog
+        open={pwdOpen}
+        onClose={() => setPwdOpen(false)}
+        title="নিজের পাসওয়ার্ড পরিবর্তন"
+        subtitle={`${user.name} (${user.phone})`}
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setPwdOpen(false)}
+              className="dm-btn dm-btn-outline"
+            >
+              বাতিল
+            </button>
+            <button
+              type="submit"
+              form={ownPwdFormId}
+              disabled={savingPwd}
+              className="dm-btn dm-btn-primary"
+            >
+              {savingPwd ? "আপডেট হচ্ছে…" : "পাসওয়ার্ড পরিবর্তন করুন"}
+            </button>
+          </>
+        }
+      >
+        <form
+          id={ownPwdFormId}
+          onSubmit={handleOwnPwdSubmit}
+          className="dm-form-grid"
+        >
+          {pwdErr && (
+            <div className="dm-alert-error" role="alert">
+              <span>{pwdErr}</span>
+            </div>
+          )}
+
+          <div className="dm-field">
+            <label htmlFor="more-old-pwd">বর্তমান পাসওয়ার্ড *</label>
+            <div className="dm-password-wrap">
+              <input
+                id="more-old-pwd"
+                type={showOld ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={oldPwd}
+                onChange={(e) => setOldPwd(e.target.value)}
+                placeholder="বর্তমান পাসওয়ার্ড লিখুন"
+                className="dm-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowOld((v) => !v)}
+                aria-label={showOld ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"}
+                className="dm-password-toggle"
+              >
+                {showOld ? (
+                  <EyeOff size={18} aria-hidden="true" />
+                ) : (
+                  <Eye size={18} aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="dm-field">
+            <label htmlFor="more-new-pwd">নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর) *</label>
+            <div className="dm-password-wrap">
+              <input
+                id="more-new-pwd"
+                type={showNew ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                value={newPwd}
+                onChange={(e) => setNewPwd(e.target.value)}
+                placeholder="কমপক্ষে ৬ অক্ষরের নতুন পাসওয়ার্ড"
+                className="dm-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew((v) => !v)}
+                aria-label={showNew ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"}
+                className="dm-password-toggle"
+              >
+                {showNew ? (
+                  <EyeOff size={18} aria-hidden="true" />
+                ) : (
+                  <Eye size={18} aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="dm-field">
+            <label htmlFor="more-confirm-pwd">পাসওয়ার্ড নিশ্চিত করুন *</label>
+            <div className="dm-password-wrap">
+              <input
+                id="more-confirm-pwd"
+                type={showConfirm ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                value={confirmPwd}
+                onChange={(e) => setConfirmPwd(e.target.value)}
+                placeholder="নতুন পাসওয়ার্ড আবার লিখুন"
+                className="dm-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                aria-label={
+                  showConfirm ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"
+                }
+                className="dm-password-toggle"
+              >
+                {showConfirm ? (
+                  <EyeOff size={18} aria-hidden="true" />
+                ) : (
+                  <Eye size={18} aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      </ModalDialog>
     </div>
   );
 }

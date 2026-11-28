@@ -8,7 +8,8 @@ export type CashLedgerKind =
   | "purchase"
   | "supplier_payment"
   | "expense"
-  | "adjustment";
+  | "adjustment"
+  | "staff_handover";
 
 export interface StoreProfile {
   name: string;
@@ -138,10 +139,24 @@ export interface CashLedgerEntry {
   amount: number;
   direction: "in" | "out";
   kind: CashLedgerKind;
+  category?: string;
   staffId?: string;
   staffName?: string;
   refId?: string;
   note?: string;
+}
+
+export interface StaffHandover {
+  id: string;
+  staffId: string;
+  staffName: string;
+  amount: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  note?: string;
+  takenBy: string;
+  takenByName?: string;
+  createdAt: string;
 }
 
 export interface StaffPerformance {
@@ -158,6 +173,8 @@ export interface StaffPerformance {
   dueCollectionCount: number;
   dueCashCollected: number;
   totalCashReceived: number;
+  totalHandedOver: number;
+  cashInHand: number;
   outstandingDue: number;
 }
 
@@ -165,6 +182,7 @@ export interface StaffDetailReport {
   staff: StaffPerformance;
   invoices: SaleInvoice[];
   collections: DueCollection[];
+  handovers: StaffHandover[];
 }
 
 export interface BootstrapPayload {
@@ -179,5 +197,6 @@ export interface BootstrapPayload {
   purchases: PurchaseInvoice[];
   collections: DueCollection[];
   ledger: CashLedgerEntry[];
+  handovers: StaffHandover[];
   staff: StaffPerformance[];
 }

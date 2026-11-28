@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  Banknote,
   BarChart3,
   Boxes,
   Building2,
@@ -7,6 +8,7 @@ import {
   ChevronRight,
   Clock,
   HandCoins,
+  History,
   Package,
   ShoppingBag,
   ShoppingCart,
@@ -424,6 +426,8 @@ export function DashboardScreen() {
         myTotalCash: 0,
         myCollectionsTotal: 0,
         myOutstandingDue: 0,
+        myTotalHandedOver: 0,
+        myCashInHand: 0,
         dueInvCount: 0,
         recentActivity: [],
       };
@@ -441,7 +445,15 @@ export function DashboardScreen() {
       (sum, col) => sum + col.amount,
       0,
     );
-    const myTotalCash = mySaleCash + myCollectionsTotal;
+    const myTotalCash = Math.round((mySaleCash + myCollectionsTotal) * 100) / 100;
+    const myTotalHandedOver =
+      Math.round(
+        (data.handovers ?? []).reduce((sum, h) => sum + h.amount, 0) * 100,
+      ) / 100;
+    const myCashInHand = Math.max(
+      0,
+      Math.round((myTotalCash - myTotalHandedOver) * 100) / 100,
+    );
     const myOutstandingDue = data.invoices.reduce(
       (sum, inv) => sum + inv.due,
       0,
@@ -480,6 +492,8 @@ export function DashboardScreen() {
       myTotalCash,
       myCollectionsTotal,
       myOutstandingDue,
+      myTotalHandedOver,
+      myCashInHand,
       dueInvCount,
       recentActivity: activityItems,
     };
@@ -568,6 +582,55 @@ export function DashboardScreen() {
           </p>
         </header>
 
+        {/* Prominent Cash In Hand Banner for Staff */}
+        <section
+          aria-label="আপনার কাছে থাকা নগদ টাকা"
+          className="dm-card"
+          style={{
+            background: "var(--dm-brand-50)",
+            borderColor: "var(--dm-brand-200)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span className="dm-kpi-icon dm-tone-emerald" aria-hidden="true">
+                <Banknote size={22} />
+              </span>
+              <div>
+                <div
+                  className="dm-num"
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 800,
+                    color: "var(--dm-brand-800)",
+                  }}
+                >
+                  আপনার কাছে এখন আছে: {formatMoneyBn(staffStats.myCashInHand)}
+                </div>
+                <p
+                  className="dm-page-sub dm-num"
+                  style={{ marginTop: 3 }}
+                >
+                  মোট নগদ প্রাপ্তি: {formatMoneyBn(staffStats.myTotalCash)} ·
+                  জমা দেওয়া হয়েছে:{" "}
+                  {formatMoneyBn(staffStats.myTotalHandedOver)}
+                </p>
+              </div>
+            </div>
+            <span className="dm-badge dm-badge-emerald">
+              শুধু নগদ হিসাব (বাকি বাদে)
+            </span>
+          </div>
+        </section>
+
         <section className="dm-kpi-grid" aria-label="আমার পারফরম্যান্স সূচক">
           {staffKpis.map(({ label, value, sub, to, icon: Icon, tone }) => (
             <button
@@ -584,7 +647,7 @@ export function DashboardScreen() {
               </span>
               <span className="dm-kpi-meta">
                 <span className="dm-kpi-label">{label}</span>
-                <span className="dm-kpi-value">{value}</span>
+                <span className="dm-kpi-value dm-num">{value}</span>
                 <span className="dm-kpi-sub">{sub}</span>
               </span>
             </button>
@@ -691,6 +754,73 @@ export function DashboardScreen() {
               </div>
             )}
           </div>
+        </section>
+
+        {/* Read-only Handover History for Staff */}
+        <section className="dm-card" aria-label="হ্যান্ডওভার ইতিহাস">
+          <div className="dm-card-head">
+            <div>
+              <h2
+                className="dm-card-title"
+                style={{ display: "flex", alignItems: "center", gap: 8 }}
+              >
+                <History size={18} aria-hidden="true" />
+                <span>
+                  হ্যান্ডওভার ইতিহাস ({toBn((data.handovers ?? []).length)}টি)
+                </span>
+              </h2>
+              <p className="dm-page-sub">
+                অ্যাডমিনের কাছে জমা দেওয়া নগদ টাকার রেকর্ড (শুধু দেখার জন্য)
+              </p>
+            </div>
+          </div>
+
+          {(data.handovers ?? []).length === 0 ? (
+            <div className="dm-empty-inline">
+              এখনো কোনো হ্যান্ডওভার ইতিহাস নেই
+            </div>
+          ) : (
+            <div className="dm-checklist">
+              {(data.handovers ?? []).map((item) => (
+                <div
+                  key={item.id}
+                  className="dm-check-row"
+                  style={{ cursor: "default" }}
+                >
+                  <span className="dm-check-row-left">
+                    <span
+                      className="dm-kpi-icon dm-tone-teal"
+                      aria-hidden="true"
+                    >
+                      <HandCoins size={17} />
+                    </span>
+                    <span style={{ minWidth: 0 }}>
+                      <span
+                        className="dm-num"
+                        style={{ display: "block", fontWeight: 700 }}
+                      >
+                        {formatDateBn(item.createdAt, true)}
+                      </span>
+                      <small
+                        className="dm-text-muted dm-num"
+                        style={{ display: "block", fontWeight: 500 }}
+                      >
+                        আগে: {formatMoneyBn(item.balanceBefore)} → পরে:{" "}
+                        {formatMoneyBn(item.balanceAfter)}
+                        {item.note ? ` · ${item.note}` : ""}
+                      </small>
+                    </span>
+                  </span>
+                  <strong
+                    className="dm-text-emerald dm-num"
+                    style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+                  >
+                    {formatMoneyBn(item.amount)}
+                  </strong>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     );
@@ -824,8 +954,8 @@ export function DashboardScreen() {
             </span>
             <span className="dm-kpi-meta">
               <span className="dm-kpi-label">{label}</span>
-              <span className="dm-kpi-value">{value}</span>
-              <span className="dm-kpi-sub">{sub}</span>
+              <span className="dm-kpi-value dm-num">{value}</span>
+              <span className="dm-kpi-sub dm-num">{sub}</span>
             </span>
           </button>
         ))}
@@ -937,6 +1067,7 @@ export function DashboardScreen() {
                       )}
                     </span>
                     <span
+                      className="dm-num"
                       style={{
                         textAlign: "right",
                         whiteSpace: "nowrap",
@@ -949,7 +1080,9 @@ export function DashboardScreen() {
                         className="dm-text-emerald"
                         style={{ display: "block", fontSize: 11.5 }}
                       >
-                        নগদ {formatMoneyBn(member.totalCashReceived)}
+                        {member.role === "staff"
+                          ? `হাতে আছে ${formatMoneyBn(member.cashInHand)}`
+                          : `নগদ ${formatMoneyBn(member.totalCashReceived)}`}
                       </span>
                     </span>
                   </span>

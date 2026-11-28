@@ -497,7 +497,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       </span>
                     </div>
 
-                    {isAdmin && (
+                    {isAdmin ? (
                       <button
                         type="button"
                         role="menuitem"
@@ -509,6 +509,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                       >
                         <Settings size={16} aria-hidden="true" />
                         <span>সেটিংস</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="dm-profile-item"
+                        onClick={() => {
+                          setProfileOpen(false);
+                          navigate("/more");
+                        }}
+                      >
+                        <Settings size={16} aria-hidden="true" />
+                        <span>পাসওয়ার্ড ও আরও</span>
                       </button>
                     )}
 

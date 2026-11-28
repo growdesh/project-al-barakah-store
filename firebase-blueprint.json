@@ -1,0 +1,243 @@
+{
+  "entities": {
+    "StoreMeta": {
+      "title": "StoreMeta",
+      "description": "Store profile, invoice settings, and opening cash configuration.",
+      "type": "object",
+      "properties": {
+        "store": { "type": "object" },
+        "settings": { "type": "object" },
+        "openingCash": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["store", "settings", "openingCash"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Application user account authenticated by mobile number and salted SHA-256 password hash.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "role": { "type": "string", "enum": ["admin", "staff"] },
+        "passwordHash": { "type": "string", "maxLength": 200 },
+        "active": { "type": "boolean" },
+        "note": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "phone", "role", "passwordHash", "active", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Wholesale store inventory product.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 200 },
+        "sku": { "type": "string", "maxLength": 64 },
+        "barcode": { "type": "string", "maxLength": 64 },
+        "category": { "type": "string", "maxLength": 100 },
+        "unit": { "type": "string", "maxLength": 40 },
+        "purchaseRate": { "type": "number" },
+        "saleRate": { "type": "number" },
+        "stock": { "type": "number" },
+        "minStock": { "type": "number" }
+      },
+      "required": ["id", "name", "sku", "category", "unit", "purchaseRate", "saleRate", "stock", "minStock"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Wholesale buyer / customer profile and due balance.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 160 },
+        "mobile": { "type": "string", "maxLength": 20 },
+        "area": { "type": "string", "maxLength": 160 },
+        "openingDue": { "type": "number" },
+        "due": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "mobile", "area", "openingDue", "due", "createdAt"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Wholesale supplier profile and payable balance.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 160 },
+        "mobile": { "type": "string", "maxLength": 20 },
+        "area": { "type": "string", "maxLength": 160 },
+        "due": { "type": "number" },
+        "lastTxn": { "type": "string", "maxLength": 80 }
+      },
+      "required": ["id", "name", "mobile", "area", "due", "lastTxn"]
+    },
+    "SaleInvoice": {
+      "title": "SaleInvoice",
+      "description": "Wholesale sales invoice with staff attribution.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "number": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "format": "date-time" },
+        "customerId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 160 },
+        "customerMobile": { "type": "string", "maxLength": 20 },
+        "staffId": { "type": "string", "maxLength": 128 },
+        "staffName": { "type": "string", "maxLength": 120 },
+        "items": { "type": "array" },
+        "itemsCount": { "type": "number" },
+        "subTotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "total": { "type": "number" },
+        "initialPaid": { "type": "number" },
+        "paid": { "type": "number" },
+        "due": { "type": "number" },
+        "status": { "type": "string", "enum": ["paid", "partial", "due"] },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "number", "date", "customerId", "customerName", "staffId", "staffName", "items", "total", "initialPaid", "paid", "due", "status"]
+    },
+    "PurchaseInvoice": {
+      "title": "PurchaseInvoice",
+      "description": "Supplier stock purchase invoice.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "number": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "format": "date-time" },
+        "supplierId": { "type": "string", "maxLength": 128 },
+        "supplierName": { "type": "string", "maxLength": 160 },
+        "supplierMobile": { "type": "string", "maxLength": 20 },
+        "items": { "type": "array" },
+        "itemsCount": { "type": "number" },
+        "subTotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "total": { "type": "number" },
+        "paid": { "type": "number" },
+        "due": { "type": "number" },
+        "status": { "type": "string", "enum": ["paid", "partial", "due"] },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "number", "date", "supplierId", "supplierName", "items", "total", "paid", "due", "status"]
+    },
+    "DueCollection": {
+      "title": "DueCollection",
+      "description": "Customer due collection (baki adai) receipt with staff attribution.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "receiptNo": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "format": "date-time" },
+        "customerId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 160 },
+        "customerMobile": { "type": "string", "maxLength": 20 },
+        "invoiceId": { "type": "string", "maxLength": 128 },
+        "invoiceNumber": { "type": "string", "maxLength": 64 },
+        "amount": { "type": "number" },
+        "staffId": { "type": "string", "maxLength": 128 },
+        "staffName": { "type": "string", "maxLength": 120 },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "receiptNo", "date", "customerId", "customerName", "amount", "staffId", "staffName"]
+    },
+    "CashLedgerEntry": {
+      "title": "CashLedgerEntry",
+      "description": "Shop cash book entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "format": "date-time" },
+        "party": { "type": "string", "maxLength": 200 },
+        "amount": { "type": "number" },
+        "direction": { "type": "string", "enum": ["in", "out"] },
+        "kind": { "type": "string", "enum": ["sale", "collection", "purchase", "supplier_payment", "expense", "adjustment", "staff_handover"] },
+        "category": { "type": "string", "maxLength": 120 },
+        "staffId": { "type": "string", "maxLength": 128 },
+        "staffName": { "type": "string", "maxLength": 120 },
+        "refId": { "type": "string", "maxLength": 128 },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "date", "party", "amount", "direction", "kind"]
+    },
+    "StaffHandover": {
+      "title": "StaffHandover",
+      "description": "Cash handover record when admin collects cash from a staff member.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "staffId": { "type": "string", "maxLength": 128 },
+        "staffName": { "type": "string", "maxLength": 120 },
+        "amount": { "type": "number" },
+        "balanceBefore": { "type": "number" },
+        "balanceAfter": { "type": "number" },
+        "note": { "type": "string", "maxLength": 500 },
+        "takenBy": { "type": "string", "maxLength": 128 },
+        "takenByName": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "staffId", "staffName", "amount", "balanceBefore", "balanceAfter", "takenBy", "createdAt"]
+    },
+    "StaffCashState": {
+      "title": "StaffCashState",
+      "description": "Transactional per-staff cash balance ledger state for concurrency-safe handovers.",
+      "type": "object",
+      "properties": {
+        "staffId": { "type": "string", "maxLength": 128 },
+        "cashBalance": { "type": "number" },
+        "totalHandedOver": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["staffId", "cashBalance", "totalHandedOver", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/meta/{docId}": {
+      "schema": { "$ref": "#/entities/StoreMeta" },
+      "description": "Singleton store metadata document (meta/store)."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Admin and staff user accounts."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Inventory products."
+    },
+    "/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Wholesale customers."
+    },
+    "/suppliers/{supplierId}": {
+      "schema": { "$ref": "#/entities/Supplier" },
+      "description": "Wholesale suppliers."
+    },
+    "/invoices/{invoiceId}": {
+      "schema": { "$ref": "#/entities/SaleInvoice" },
+      "description": "Sales invoices."
+    },
+    "/purchases/{purchaseId}": {
+      "schema": { "$ref": "#/entities/PurchaseInvoice" },
+      "description": "Purchase invoices."
+    },
+    "/collections/{collectionId}": {
+      "schema": { "$ref": "#/entities/DueCollection" },
+      "description": "Customer due collections."
+    },
+    "/ledger/{ledgerId}": {
+      "schema": { "$ref": "#/entities/CashLedgerEntry" },
+      "description": "Cash book entries."
+    },
+    "/handovers/{handoverId}": {
+      "schema": { "$ref": "#/entities/StaffHandover" },
+      "description": "Staff cash handover records."
+    },
+    "/staffCash/{staffId}": {
+      "schema": { "$ref": "#/entities/StaffCashState" },
+      "description": "Atomic per-staff cash balance documents."
+    }
+  }
+}

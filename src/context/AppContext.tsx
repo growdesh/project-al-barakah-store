@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from "react";
 import {
-  ApiError,
   api,
   clearStoredToken,
   getStoredToken,
@@ -17,6 +16,7 @@ import {
   type CollectionCreateInput,
   type CustomerCreateInput,
   type CustomerUpdateInput,
+  type HandoverCreateInput,
   type ProductCreateInput,
   type ProductUpdateInput,
   type PurchaseCreateInput,
@@ -24,7 +24,9 @@ import {
   type SupplierCreateInput,
   type SupplierUpdateInput,
 } from "../lib/api";
-import { normalizePhone } from "../lib/format";
+import { useOnlineStatus } from "../hooks/useOnlineStatus";
+import { ensureInitialSeed } from "../lib/firestoreStore";
+import { formatMoneyBn, normalizePhone } from "../lib/format";
 import { navigate } from "../lib/router";
 import type {
   AuthUser,
@@ -34,49 +36,11 @@ import type {
   Product,
   PurchaseInvoice,
   SaleInvoice,
+  StaffHandover,
   StoreProfile,
   StoreSettings,
   Supplier,
 } from "../types";
-
-const BOOTSTRAP_CACHE_KEY = "ab_bootstrap_cache_v2";
-
-function saveBootstrapCache(payload: BootstrapPayload): void {
-  try {
-    window.localStorage.setItem(BOOTSTRAP_CACHE_KEY, JSON.stringify(payload));
-  } catch {
-    // Ignore storage quota errors
-  }
-}
-
-function loadBootstrapCache(): BootstrapPayload | null {
-  try {
-    const raw = window.localStorage.getItem(BOOTSTRAP_CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as BootstrapPayload;
-    if (parsed && parsed.user && parsed.store) return parsed;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function clearBootstrapCache(): void {
-  try {
-    window.localStorage.removeItem(BOOTSTRAP_CACHE_KEY);
-  } catch {
-    // Ignore storage access errors
-  }
-}
-
-function ensureOnline(): void {
-  if (api.isLocalMode()) return;
-  if (typeof navigator !== "undefined" && !navigator.onLine) {
-    throw new Error(
-      "আপনি এখন অফলাইনে আছেন। নতুন এন্ট্রি সংরক্ষণের জন্য ইন্টারনেট সংযোগ চালু করুন।",
-    );
-  }
-}
 
 export interface AppContextValue {
   loading: boolean;
@@ -89,6 +53,7 @@ export interface AppContextValue {
   refresh: () => Promise<BootstrapPayload>;
   createSale: (input: SaleCreateInput) => Promise<SaleInvoice>;
   createCollection: (input: CollectionCreateInput) => Promise<DueCollection>;
+  createHandover: (input: HandoverCreateInput) => Promise<StaffHandover>;
   createCustomer: (input: CustomerCreateInput) => Promise<Customer>;
   updateCustomer: (id: string, input: CustomerUpdateInput) => Promise<Customer>;
   deleteCustomer: (id: string) => Promise<void>;
@@ -129,6 +94,8 @@ export interface AppContextValue {
       note?: string;
     },
   ) => Promise<void>;
+  changeStaffPassword: (id: string, newPassword: string) => Promise<void>;
+  changeOwnPassword: (oldPassword: string, newPassword: string) => Promise<void>;
   updateSettings: (input: {
     store?: Partial<StoreProfile>;
     settings?: Partial<StoreSettings>;
@@ -139,19 +106,14 @@ export interface AppContextValue {
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const isOnline = useOnlineStatus();
+  const [sessionUid, setSessionUid] = useState<string | null>(() =>
+    getStoredToken(),
+  );
   const [loading, setLoading] = useState<boolean>(true);
-  const [data, setDataState] = useState<BootstrapPayload | null>(null);
+  const [data, setData] = useState<BootstrapPayload | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<number | null>(null);
-
-  const setData = useCallback((payload: BootstrapPayload | null) => {
-    setDataState(payload);
-    if (payload) {
-      saveBootstrapCache(payload);
-    } else {
-      clearBootstrapCache();
-    }
-  }, []);
 
   const toast = useCallback((msg: string) => {
     setToastMessage(msg);
@@ -161,7 +123,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toastTimerRef.current = window.setTimeout(() => {
       setToastMessage(null);
       toastTimerRef.current = null;
-    }, 3200);
+    }, 3400);
   }, []);
 
   useEffect(() => {
@@ -172,166 +134,179 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Ensure initial users + store metadata are seeded on first run (online only)
   useEffect(() => {
+    if (!isOnline) return;
+    ensureInitialSeed().catch(() => {
+      // Login / subscribe will surface connectivity errors cleanly
+    });
+  }, [isOnline]);
+
+  // Online-only realtime Firestore listeners for active session
+  useEffect(() => {
+    if (!isOnline) {
+      return;
+    }
+
+    if (!sessionUid) {
+      setData(null);
+      setLoading(false);
+      return;
+    }
+
     let active = true;
-    (async () => {
-      try {
-        const payload = await api.bootstrap();
-        if (active) {
-          setData(payload);
-        }
-      } catch (err) {
-        const isAuthError =
-          err instanceof ApiError && (err.status === 401 || err.status === 403);
-        if (!isAuthError && getStoredToken()) {
-          const cached = loadBootstrapCache();
-          if (cached && active) {
-            setDataState(cached);
-            return;
-          }
-        }
+    setLoading((prev) => (data ? prev : true));
+
+    const unsubscribe = api.subscribe(
+      sessionUid,
+      (payload) => {
+        if (!active) return;
+        setData(payload);
+        setLoading(false);
+      },
+      (reason) => {
+        if (!active) return;
         clearStoredToken();
-        clearBootstrapCache();
-        if (active) {
-          setDataState(null);
+        setSessionUid(null);
+        setData(null);
+        setLoading(false);
+        navigate("/", { replace: true });
+        if (reason) {
+          toast(reason);
         }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    })();
+      },
+      (err) => {
+        if (!active) return;
+        setLoading(false);
+        toast(
+          err instanceof Error
+            ? err.message
+            : "সার্ভারের সাথে সংযোগে সমস্যা হয়েছে",
+        );
+      },
+    );
+
     return () => {
       active = false;
+      unsubscribe();
     };
-  }, [setData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionUid, isOnline, toast]);
 
-  // Auto-sync when connectivity returns while authenticated
-  useEffect(() => {
-    const onOnline = () => {
-      if (!getStoredToken()) return;
-      api
-        .bootstrap()
-        .then((payload) => {
-          setData(payload);
-        })
-        .catch(() => {
-          // Keep current state quietly if reconnect fails
-        });
-    };
-    window.addEventListener("online", onOnline);
-    return () => window.removeEventListener("online", onOnline);
-  }, [setData]);
-
-  const login = useCallback(
-    async (phone: string, password: string) => {
-      ensureOnline();
-      const res = await api.login(normalizePhone(phone), password);
-      setStoredToken(res.token);
-      try {
-        const payload = await api.bootstrap();
-        setData(payload);
-      } catch (err) {
-        clearStoredToken();
-        setData(null);
-        throw err;
-      }
-    },
-    [setData],
-  );
+  const login = useCallback(async (phone: string, password: string) => {
+    const res = await api.login(normalizePhone(phone), password);
+    setStoredToken(res.token);
+    try {
+      const payload = await api.bootstrap();
+      setData(payload);
+      setSessionUid(res.token);
+      setLoading(false);
+    } catch (err) {
+      clearStoredToken();
+      setSessionUid(null);
+      setData(null);
+      throw err;
+    }
+  }, []);
 
   const logout = useCallback(async () => {
     try {
       await api.logout();
     } catch {
-      // Ignore logout transport failures and clear local session state cleanly.
+      // Clear local session cleanly even if offline
     } finally {
       clearStoredToken();
+      setSessionUid(null);
       setData(null);
       navigate("/", { replace: true });
     }
-  }, [setData]);
+  }, []);
 
   const refresh = useCallback(async () => {
     const payload = await api.bootstrap();
     setData(payload);
     return payload;
-  }, [setData]);
+  }, []);
 
   const createSale = useCallback(
     async (input: SaleCreateInput) => {
-      ensureOnline();
       const res = await api.createSale(input);
       setData(res.bootstrap);
       toast(`বিক্রয় সম্পন্ন হয়েছে (${res.invoice.number})`);
       return res.invoice;
     },
-    [setData, toast],
+    [toast],
   );
 
   const createCollection = useCallback(
     async (input: CollectionCreateInput) => {
-      ensureOnline();
       const res = await api.createCollection(input);
       setData(res.bootstrap);
       toast(`বকেয়া আদায় সম্পন্ন (${res.collection.receiptNo})`);
       return res.collection;
     },
-    [setData, toast],
+    [toast],
+  );
+
+  const createHandover = useCallback(
+    async (input: HandoverCreateInput) => {
+      const res = await api.createHandover(input);
+      setData(res.bootstrap);
+      toast(
+        `স্টাফ থেকে ${formatMoneyBn(res.handover.amount)} গ্রহণ সম্পন্ন হয়েছে`,
+      );
+      return res.handover;
+    },
+    [toast],
   );
 
   const createCustomer = useCallback(
     async (input: CustomerCreateInput) => {
-      ensureOnline();
       const res = await api.createCustomer(input);
       setData(res.bootstrap);
       toast(`নতুন কাস্টমার যোগ হয়েছে: ${res.customer.name}`);
       return res.customer;
     },
-    [setData, toast],
+    [toast],
   );
 
   const updateCustomer = useCallback(
     async (id: string, input: CustomerUpdateInput) => {
-      ensureOnline();
       const res = await api.updateCustomer(id, input);
       setData(res.bootstrap);
       toast("কাস্টমার তথ্য আপডেট হয়েছে");
       return res.customer;
     },
-    [setData, toast],
+    [toast],
   );
 
   const deleteCustomer = useCallback(
     async (id: string) => {
-      ensureOnline();
       const res = await api.deleteCustomer(id);
       setData(res.bootstrap);
       toast("কাস্টমার মুছে ফেলা হয়েছে");
     },
-    [setData, toast],
+    [toast],
   );
 
   const createProduct = useCallback(
     async (input: ProductCreateInput) => {
-      ensureOnline();
       const res = await api.createProduct(input);
       setData(res.bootstrap);
       toast(`নতুন পণ্য যোগ হয়েছে: ${res.product.name}`);
       return res.product;
     },
-    [setData, toast],
+    [toast],
   );
 
   const updateProduct = useCallback(
     async (id: string, input: ProductUpdateInput) => {
-      ensureOnline();
       const res = await api.updateProduct(id, input);
       setData(res.bootstrap);
       toast("পণ্যের তথ্য আপডেট হয়েছে");
       return res.product;
     },
-    [setData, toast],
+    [toast],
   );
 
   const adjustStock = useCallback(
@@ -339,66 +314,60 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: string,
       input: { mode: "add" | "subtract" | "set"; qty: number },
     ) => {
-      ensureOnline();
       const res = await api.adjustStock(id, input);
       setData(res.bootstrap);
       toast("স্টক আপডেট হয়েছে");
       return res.product;
     },
-    [setData, toast],
+    [toast],
   );
 
   const deleteProduct = useCallback(
     async (id: string) => {
-      ensureOnline();
       const res = await api.deleteProduct(id);
       setData(res.bootstrap);
       toast("পণ্য মুছে ফেলা হয়েছে");
     },
-    [setData, toast],
+    [toast],
   );
 
   const createPurchase = useCallback(
     async (input: PurchaseCreateInput) => {
-      ensureOnline();
       const res = await api.createPurchase(input);
       setData(res.bootstrap);
       toast(`ক্রয় সম্পন্ন হয়েছে (${res.purchase.number})`);
       return res.purchase;
     },
-    [setData, toast],
+    [toast],
   );
 
   const createSupplier = useCallback(
     async (input: SupplierCreateInput) => {
-      ensureOnline();
       const res = await api.createSupplier(input);
       setData(res.bootstrap);
       toast(`নতুন সাপ্লায়ার যোগ হয়েছে: ${res.supplier.name}`);
       return res.supplier;
     },
-    [setData, toast],
+    [toast],
   );
 
   const updateSupplier = useCallback(
     async (id: string, input: SupplierUpdateInput) => {
-      ensureOnline();
       const res = await api.updateSupplier(id, input);
       setData(res.bootstrap);
       toast("সাপ্লায়ার তথ্য আপডেট হয়েছে");
       return res.supplier;
     },
-    [setData, toast],
+    [toast],
   );
 
   const paySupplier = useCallback(
     async (id: string, input: { amount: number; note?: string }) => {
-      ensureOnline();
       const res = await api.paySupplier(id, input);
       setData(res.bootstrap);
       toast("সাপ্লায়ার বকেয়া পরিশোধ সম্পন্ন");
     },
-    [setData, toast],
+    [toast],
   );
 
   const createLedger = useCallback(
@@ -409,12 +378,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       kind: "expense" | "adjustment";
       note?: string;
     }) => {
-      ensureOnline();
       const res = await api.createLedger(input);
       setData(res.bootstrap);
       toast("হিসাবের এন্ট্রি সংরক্ষণ হয়েছে");
     },
-    [setData, toast],
+    [toast],
   );
 
   const createStaff = useCallback(
@@ -424,12 +392,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       password: string;
       note?: string;
     }) => {
-      ensureOnline();
       const res = await api.createStaff(input);
       setData(res.bootstrap);
       toast("নতুন স্টাফ যোগ হয়েছে");
     },
-    [setData, toast],
+    [toast],
   );
 
   const updateStaff = useCallback(
@@ -443,12 +410,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
         note?: string;
       },
     ) => {
-      ensureOnline();
       const res = await api.updateStaff(id, input);
       setData(res.bootstrap);
       toast("স্টাফের তথ্য আপডেট হয়েছে");
     },
-    [setData, toast],
+    [toast],
+  );
+
+  const changeStaffPassword = useCallback(
+    async (id: string, newPassword: string) => {
+      const res = await api.changeStaffPassword(id, newPassword);
+      setData(res.bootstrap);
+      toast("স্টাফের পাসওয়ার্ড পরিবর্তন হয়েছে");
+    },
+    [toast],
+  );
+
+  const changeOwnPassword = useCallback(
+    async (oldPassword: string, newPassword: string) => {
+      await api.changeOwnPassword(oldPassword, newPassword);
+      toast("পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে");
+    },
+    [toast],
   );
 
   const updateSettings = useCallback(
@@ -457,12 +440,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       settings?: Partial<StoreSettings>;
       adminPassword?: string;
     }) => {
-      ensureOnline();
       const res = await api.updateSettings(input);
       setData(res.bootstrap);
       toast("সেটিংস সংরক্ষণ হয়েছে");
     },
-    [setData, toast],
+    [toast],
   );
 
   const value = useMemo<AppContextValue>(
@@ -477,6 +459,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       refresh,
       createSale,
       createCollection,
+      createHandover,
       createCustomer,
       updateCustomer,
       deleteCustomer,
@@ -491,6 +474,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createLedger,
       createStaff,
       updateStaff,
+      changeStaffPassword,
+      changeOwnPassword,
       updateSettings,
     }),
     [
@@ -503,6 +488,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       refresh,
       createSale,
       createCollection,
+      createHandover,
       createCustomer,
       updateCustomer,
       deleteCustomer,
@@ -517,6 +503,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createLedger,
       createStaff,
       updateStaff,
+      changeStaffPassword,
+      changeOwnPassword,
       updateSettings,
     ],
   );

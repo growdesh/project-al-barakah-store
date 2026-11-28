@@ -1,8 +1,11 @@
 import { ShieldAlert } from "lucide-react";
 import { Suspense, lazy, type ReactNode } from "react";
 import { AppShell } from "./components/AppShell";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { OfflineGate } from "./components/OfflineGate";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useApp } from "./context/AppContext";
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { normalizePath, useRouter } from "./lib/router";
 import { DashboardScreen } from "./screens/DashboardScreen";
 import { LoginScreen } from "./screens/LoginScreen";
@@ -75,8 +78,21 @@ function ScreenSkeleton() {
 }
 
 export function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}
+
+function AppContent() {
+  const isOnline = useOnlineStatus();
   const { loading, user, data } = useApp();
   const { path, navigate } = useRouter();
+
+  if (!isOnline) {
+    return <OfflineGate />;
+  }
 
   if (loading) {
     return (
